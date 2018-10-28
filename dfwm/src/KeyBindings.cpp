@@ -36,9 +36,8 @@ void KeyBindings::openProgram(Dfwm* dfwm) {
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 	//int keyState = keyCode->state;
-	int key = XLookupKeysym(keyCode, 0) << keyCode->state;
-	std::string txt = "Mod: " + std::to_string(MOD) + ", State: " + std::to_string(keyCode->state) + ", KeyCode: " + std::to_string(keyCode->keycode); 
-	//std::cout << "MOD: " << MOD << ", State: " << std::to_string(keyCode->state) << ", KeyCode: " << std::to_string(keyCode->keycode) << std::endl; 
+	int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
+
 	//dfwm->getStatusBar()->setText(txt);
 	//dfwm->getStatusBar()->redraw();
 	if (key == XK_Escape) 			dfwm->quit();
