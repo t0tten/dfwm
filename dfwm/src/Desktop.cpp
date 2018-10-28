@@ -226,10 +226,13 @@ Window Desktop::findAllWindows(Window* known, int amount) {
 Window Desktop::openProgram(std::string program, Window* known, int amount) {
 	if(system("/usr/bin/mate-terminal &") != -1) {
 		std::cout << "Opened!" <<  std::endl;		
-		Window newWnd = findAllWindows(known, amount);
-		if(newWnd != -1) addWindow(newWnd);
-		resizeWindows();
-		return newWnd;
+		//Window newWnd = findAllWindows(known, amount);
+
+		//Window newWnd = get_top_window_from_stack();
+		//if(newWnd != -1) addWindow(newWnd);
+
+		//resizeWindows();
+		//return newWnd;
 	}
 
 	return -1;

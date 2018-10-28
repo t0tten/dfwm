@@ -4,6 +4,7 @@
 #include "./Color.h"
 
 static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask;
+static long ROOT_EVENT_MASK		= SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
 static int COL_SELECTED_BG 		= YELLOW;
 static int COL_SELECTED_FG 		= BLACK;
 static int COL_MENU_BG			= GRAY;

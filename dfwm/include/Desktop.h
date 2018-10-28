@@ -36,7 +36,7 @@ class Desktop {
 		void resizeWindows();
 		void addWindow(Window, Window*&, int&);
 
-		Window findAllWindows(Window*, int);
+
 		
 		Window* get_win_list_stacked(unsigned long*);
 		int minimized_window(Window);
@@ -58,6 +58,7 @@ class Desktop {
 		void addWindow(Window);
 		void removeWindow(Window);
 		Window openProgram(std::string, Window*, int);
+		Window findAllWindows(Window*, int);
 };
 
 #endif //_DESKTOP_

@@ -69,6 +69,11 @@ void Dfwm::init () {
 	this->maxDesktops = 5;
 	if(maxDesktops > 9) maxDesktops = 9;
 
+	/* Change property of root */
+	XSetWindowAttributes rootNewAttr;
+	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
+	XChangeWindowAttributes(disp, root, CWEventMask|CWCursor, &rootNewAttr);
+	
 	/* Find all open windows */
 	this->size 	= 20;
 	this->nrOfOpen	= 0;
@@ -138,6 +143,13 @@ void Dfwm::removeOpen(Window window) {
 void Dfwm::run () {
 	while(running) {
 		XNextEvent (disp, &e);
+		
+		Window wnd = this->desktop[selected - 1]->findAllWindows(this->opened, this->nrOfOpen);
+		if(wnd != -1) {
+			this->desktop[selected - 1]->addWindow(wnd);
+			this->addOpen(wnd);
+		}		
+
 		//std::cout << "Event" << std::endl;
 		if (e.type == Expose) {
 			//std::cout << "Expose" << std::endl;
@@ -150,6 +162,13 @@ void Dfwm::run () {
 		}
 		if (e.type == KeyRelease) keys->translate_KeyUp(this, &e.xkey);
 		if (e.type == ButtonRelease) std::cout << "ButtonRelease" << std::endl;
+		if (e.type == PropertyNotify) {
+			std::cout << "PropertyNotify" << std::endl;
+			std::string txt = "PropertyNotify";
+
+			this->bar->setText(txt);	
+			this->bar->redraw();
+		}
 	}
 }
 
