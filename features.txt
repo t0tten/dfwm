@@ -1,0 +1,13 @@
+* Scale graphics
+* OOP
+* Put menu in middle of screen
+* Create an launcher
+* Fix key binding
+* Create windows
+* Find correct status texts positions
+* Minimize functionality
+* Workspace - 2-dmin arr. One for main flow and one for stacking windows
+* Change color on desktop in menu when a window is opened on the desktop
+* Only update correct window on change
+* Clickable status information
+* Configurations
