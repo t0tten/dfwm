@@ -56,7 +56,10 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
  	else if (key == (XK_Right << MOD))	changeDesktop(dfwm, true);
  	else if (key == (XK_Down << MOD))	changeDesktop(dfwm, false);
  	else if (key == (XK_Left << MOD))	changeDesktop(dfwm, false);
- 	else if (key == (XK_Return << MOD))	openProgram(dfwm);
+ 	else if (key == (XK_Return << MOD)) {
+                openProgram(dfwm);
+                dfwm->getMenu()->hide();
+        }
 }
 
 void KeyBindings::translate_KeyUp (Dfwm* dfwm, XKeyEvent* keyCode) {
