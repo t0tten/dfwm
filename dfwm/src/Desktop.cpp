@@ -1,4 +1,5 @@
 #include "../include/Desktop.h"
+#include <X11/Xatom.h>
 
 Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int height, int wgap, int border, int borderColor) {
 	this->disp		= disp;
@@ -235,102 +236,88 @@ Window Desktop::openProgram(std::string program, Window* known, int amount) {
 }
 /* https://www.linuxquestions.org/questions/programming-9/getting-the-pid-of-the-top-active-window-776938/ */
 Window* Desktop::get_win_list_stacked(unsigned long *len){
-    Atom type;
-    int form;
-    unsigned long remain;
-    unsigned char *list;
+	Atom type;
+	int form;
+	unsigned long remain;
+	unsigned char *list;
 
-//NET_ACTIVE_WINDOW = disp.intern_atom('_NET_ACTIVE_WINDOW')
-//NET_WM_NAME = disp.intern_atom('_NET_WM_NAME')  # UTF-8
-//WM_NAME = disp.intern_atom('WM_NAME') 
+	//NET_ACTIVE_WINDOW = disp.intern_atom('_NET_ACTIVE_WINDOW')
+	//NET_WM_NAME = disp.intern_atom('_NET_WM_NAME')  # UTF-8
+	//WM_NAME = disp.intern_atom('WM_NAME') 
 
-    X_NET_CLIENT_LIST_STACKING = disp.intern_atom('_X_NET_CLIENT_LIST_STACKING');
+	//X_NET_CLIENT_LIST_STACKING = disp.intern_atom('_X_NET_CLIENT_LIST_STACKING');
 
-    errno = 0;
-    if(XGetWindowProperty(disp, root, X_NET_CLIENT_LIST_STACKING, 0, 1024, False, XA_WINDOW, &type, &form, len, &remain, &list) != Success)
-    {
-        return 0;
-    }
+	errno = 0;
+	//if(XGetWindowProperty(disp, root, X_NET_CLIENT_LIST_STACKING, 0, 1024, False, XA_WINDOW, &type, &form, len, &remain, &list) != Success) {
+	if(XGetWindowProperty(disp, *root, XInternAtom(disp, "_X_NET_CLIENT_LIST_STACKING", True), 0, 1024, False, XA_WINDOW, &type, &form, len, &remain, &list) != Success) {
+		return 0;
+	}
 
-    return (Window*)list;
+	return (Window*)list;
 }
 
 int Desktop::minimized_window(Window win)
 {
-    Atom type;
-    int form;
-    unsigned long i, len, remain;
-    Atom *atoms;
+	Atom type;
+	int form;
+	unsigned long i, len, remain;
+	Atom *atoms;
 
-    atoms = NULL;
+	atoms = NULL;
+	
+	//NET_WM_STATE	= disp.intern_atom('_NET_WM_STATE');
 
-    XGetWindowProperty(disp, win, X_NET_WM_STATE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+	XGetWindowProperty(disp, win, XInternAtom(disp, "_X_NET_WM_STATE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
-    for(i=0; i<len; ++i) {
-        if(atoms[i]==X_NET_WM_STATE_HIDDEN) {
-            XFree(atoms);
-            return 1;
-        }
-    }
-    XFree(atoms);
-    return 0;
+	for(i=0; i<len; ++i) {
+		if(atoms[i] == XInternAtom(disp, "_X_NET_WM_STATE_HIDDEN", True)) {
+			XFree(atoms);
+			return 1;
+		}
+	}
+
+	XFree(atoms);
+	return 0;
 }
 
 int Desktop::is_skip_taskbar_or_pager_set(Window win)
 {
-    Atom type;
-    int form;
-    unsigned long i, len, remain;
-    Atom *atoms;
+	Atom type;
+	int form;
+	unsigned long i, len, remain;
+	Atom *atoms;
 
-    atoms = NULL;
+	atoms = NULL;
 
-    XGetWindowProperty(disp, win, X_NET_WM_STATE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+	XGetWindowProperty(disp, win,XInternAtom(disp, "_X_NET_WM_STATE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
-    for(i=0; i<len; ++i)
-    {
-        if((atoms[i]==X_NET_WM_STATE_SKIP_TASKBAR) || (atoms[i]==X_NET_WM_STATE_SKIP_PAGER))
-        {
-            XFree(atoms);
-            return 1;
-        }
-    }
-    XFree(atoms);
-    return 0;
+	for(i=0; i<len; ++i) {
+		if((atoms[i] == XInternAtom(disp, "_X_NET_WM_STATE_SKIP_TASKBAR", True)) || 
+			(atoms[i] == XInternAtom(disp, "_X_NET_WM_STATE_SKIP_PAGER", True))) {
+			XFree(atoms);
+			return 1;
+		}
+	}
+
+	XFree(atoms);
+	return 0;
 }
 
-Window Desktop::get_top_window_from_stack()
-{
-    int i;
-    unsigned long len;
-    Window *list;
-    Window ret;
+Window Desktop::get_top_window_from_stack() {
+	int i;
+	unsigned long len;
+	Window *list;
+	Window ret;
 
-    ret = 0;
+	ret = 0;
 
-    list = (Window*) get_win_list_stacked(&len);
+	list = (Window*) get_win_list_stacked(&len);
 
-    for (i = 0; i < (int) len; i++) {
-        if (!is_skip_taskbar_or_pager_set((Window) list[i]) && !minimized_window((Window) list[i]))
-            ret = list[i];
-    }
+	for (i = 0; i < (int) len; i++) {
+		if (!is_skip_taskbar_or_pager_set((Window) list[i]) && !minimized_window((Window) list[i])) ret = list[i];
+	}
 
-    XFree(list);
+	XFree(list);
 
-    return ret;
+	return ret;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -106,7 +106,7 @@ void Dfwm::init () {
 	/* Assign all found windows to a desktop */
 	for(int i = 0; i < nrOfWindows; i++) {
 		/* REMOVE WHEN TESTING */
-		this->desktop[selected - 1]->addWindow(windows[i]);
+		//this->desktop[selected - 1]->addWindow(windows[i]);
 		addOpen(windows[i]);
 	}
 
