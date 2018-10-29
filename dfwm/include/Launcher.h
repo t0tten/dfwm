@@ -29,7 +29,7 @@ class Launcher {
 		void search();
 
 	public:
-		Launcher(Display*, Window*, int, int);
+		Launcher(Display*, Window*);
 		~Launcher();
 
 		void show();

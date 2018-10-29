@@ -20,6 +20,7 @@ class Desktop {
 		Window* left;
 		Window* right;
 		Window* root;
+		Window currFocus;
 
 		int wgap;
 
@@ -27,9 +28,6 @@ class Desktop {
 		int amountRight;
 		int size;	
 
-		int border;
-		int borderColor;
-		
 		int findWindow(Window, Window*, int);
 
 		void expandArray(Window*&, int amount);
@@ -37,7 +35,7 @@ class Desktop {
 		void addWindow(Window, Window*&, int&);
 
 	public:
-		Desktop(Display*, Window*, int, int, int, int, int, int, int);
+		Desktop(Display*, Window*, int, int, int, int);
 		~Desktop();
 
 		void show();
@@ -52,6 +50,7 @@ class Desktop {
 		void killWindow(Window);
 		bool removeWindow(Window);
 		void openProgram(std::string);
+		void setCurrentFocusedWindow(Window);
 };
 
 #endif //_DESKTOP_
