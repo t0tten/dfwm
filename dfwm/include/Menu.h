@@ -16,14 +16,13 @@ class Menu {
 
 		int x, y;
 		int diameter, dd;
-		int color;
 
 		int pWidth, pHeight;
 		int nrOfDesktops;
 		int* selected;
 
 	public:
-		Menu(Display*, Window*, int, int, int, int*, int);
+		Menu(Display*, Window*, int, int*, int);
 		~Menu();
 
 		void changeAlignment(int);
