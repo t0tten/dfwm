@@ -10,10 +10,11 @@
 class Dfwm;
 class KeyBindings {
 	private:
+		Display* disp;
 		void changeDesktop(Dfwm*, bool);
 		void changeDesktop(Dfwm*, int);
 	public:
-		KeyBindings ();
+		KeyBindings (Display*);
 		~KeyBindings ();
 		void translate_KeyDown (Dfwm*, XKeyEvent*);
 		void translate_KeyUp (Dfwm*, XKeyEvent*);

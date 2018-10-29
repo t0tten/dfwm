@@ -7,6 +7,7 @@
 #include "./StatusBar.h"
 #include "./Menu.h"
 #include "./Desktop.h"
+#include "./Launcher.h"
 
 #include <iostream>
 #include <string>
@@ -25,6 +26,7 @@ class Dfwm {
 		StatusBar* bar;
 		Menu* menu;
 		Desktop** desktop;
+		Launcher* launcher;
 		
 		int size;
 		int nrOfMapped;
@@ -57,10 +59,11 @@ class Dfwm {
 
 		void redraw();
 
-		Menu* getMenu();
-		StatusBar* getStatusBar();
-		Desktop* getCurrentDesktop();
-		
+		Menu* 		getMenu();
+		StatusBar* 	getStatusBar();
+		Desktop* 	getCurrentDesktop();
+		Launcher* 	getLauncher();	
+
 		void addMapped(Window);
 		void removeMapped(Window);
 		Window* getMappedList();

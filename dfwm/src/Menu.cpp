@@ -43,7 +43,6 @@ void Menu::changeAlignment(int alignment) {
 }
 
 void Menu::show() {
-	std::cout << "Menu::show()" << std::endl;
 	XMapWindow(disp, menu);
 	XRaiseWindow(disp, menu);
 }
