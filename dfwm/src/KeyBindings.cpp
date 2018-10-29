@@ -22,6 +22,7 @@ void KeyBindings::changeDesktop(Dfwm* dfwm, int desktop) {
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 	int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
+
 	if (key == XK_Escape) 			dfwm->quit();
 	else if (key == XK_Alt_L) 		dfwm->getMenu()->show();
 	else if (key == (XK_1 << MOD)) 		changeDesktop(dfwm, 1); 
