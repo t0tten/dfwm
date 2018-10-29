@@ -16,6 +16,7 @@ Dfwm::~Dfwm () {
 	delete this->keys;
 	delete this->bar;
 	delete this->menu;
+	delete this->launcher;
 	for(int i = 0; i < maxDesktops; i++) {
 		delete desktop[i];
 	}
@@ -94,18 +95,22 @@ void Dfwm::init () {
 	XMapWindow (disp, root);
 	this->selected 	= 1;
 	this->running 	= true;
-	this->keys 	= new KeyBindings();
+	this->keys 	= new KeyBindings(disp);
+
 	this->bar 	= new StatusBar(disp, &root, &selected);
 	this->menu 	= new Menu(disp, &root, 150, GRAY, LEFT, &selected, maxDesktops);
 	this->bar->redraw();
 	this->desktop	= new Desktop*[maxDesktops];
-	
+	this->launcher	= new Launcher(disp, &root, GRAY, LGT_GRAY);	
+
 	for(int i = 0; i < maxDesktops; i++) {
 		this->desktop[i] = new Desktop(disp, &root, 0, bar->getHeight(), sWidth, sHeight, 10, 1, COL_BORDER_COLOR);	
 	}
 
+	/* Register windows */
 	addMapped(bar->getWindowID());
 	addMapped(menu->getWindowID());		
+	addMapped(launcher->getWindowID());
 
 	/* Assign all found windows to a desktop */
 	for(int i = 0; i < nrOfWindows; i++) {
@@ -201,12 +206,13 @@ void Dfwm::redraw() {
 	XClearArea(disp, root, 0,0, 500, 500, True);
 }
 
-Menu* Dfwm::getMenu() { return this->menu; }
-StatusBar* Dfwm::getStatusBar() { return this->bar; }
-Desktop* Dfwm::getCurrentDesktop() { return this->desktop[selected - 1]; }
+Menu* Dfwm::getMenu() 			{ return this->menu; }
+StatusBar* Dfwm::getStatusBar() 	{ return this->bar; }
+Desktop* Dfwm::getCurrentDesktop() 	{ return this->desktop[selected - 1]; }
+Launcher* Dfwm::getLauncher() 		{ return this->launcher; }
 
-Window* Dfwm::getMappedList() { return this->mapped; }
-int Dfwm::getNrOfMapped() { return this->nrOfMapped; }
+Window* Dfwm::getMappedList() 		{ return this->mapped; }
+int Dfwm::getNrOfMapped() 		{ return this->nrOfMapped; }
 
 bool Dfwm::isMapped(Window wnd) {
 	bool found = false;
@@ -220,6 +226,7 @@ bool Dfwm::isMapped(Window wnd) {
 void Dfwm::drawGraphics(Window window) {	
 	if(window == bar->getWindowID()) bar->draw();
 	else if(window == menu->getWindowID()) menu->draw();
+	else if(window == launcher->getLauncherWindow()) launcher->draw();
 }
 
 void Dfwm::addWindowToDesktop(Window window) {
@@ -237,3 +244,4 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 		this->desktop[selected - 1]->removeWindow(window);
 	}
 }
+

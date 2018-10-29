@@ -19,9 +19,12 @@ static int COL_STATUS_BAR_INFO		= WHITE;
 static int COL_STATUS_BAR_DESKTOP_FG	= BLACK;
 static int COL_STATUS_BAR_DESKTOP_BG	= YELLOW;
 static int COL_BORDER_COLOR		= YELLOW;
+static int COL_LAUNCHER_BG		= GRAY;
+static int COL_LAUNCHER_FG		= LGT_GRAY;
 
 static int CIRCLE[2]			= {0, 360 * 64};
 
 enum Alignment {CENTER, LEFT, RIGHT};
+enum LauncherState {SHOWING, HIDING};
 
 #endif //_CONSTANTS_
