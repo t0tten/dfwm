@@ -115,6 +115,9 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                 case ACTION_KILL_ACTIVE:
                         std::cout << "Killing window" << std::endl;
                         break;
+                case ACTION_DMENU:
+                        dfwm->getCurrentDesktop()->openProgram(DMENU);
+                        break;
                 default:
                         std::cout << "err: unknown action" << std::endl;
                         break;
