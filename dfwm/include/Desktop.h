@@ -47,7 +47,7 @@ class Desktop {
 		void moveToRight(Window);
 
 		void addWindow(Window);
-		void killWindow(Window);
+		void killCurrentWindow();
 		bool removeWindow(Window);
 		void openProgram(std::string);
 		void setCurrentFocusedWindow(Window);

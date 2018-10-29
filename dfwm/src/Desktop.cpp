@@ -17,6 +17,8 @@ Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int he
 
 	this->left		= new Window[size];	
 	this->right		= new Window[size];
+	
+	this->currFocus		= -1;
 }
 
 Desktop::~Desktop () {
@@ -66,10 +68,7 @@ void Desktop::moveToRight(Window window) {
 
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	expandArray(arr, size);
-	
-	XSetWindowAttributes wndAttr;
-	wndAttr.border_pixel = COL_BORDER;
-	XChangeWindowAttributes(disp, window, CWBorderPixel, &wndAttr);
+	XSetWindowBorder(disp, window, COL_BORDER);
 	
 	XWindowChanges wChange;
 	wChange.border_width = BORDER_WIDTH;
@@ -100,8 +99,11 @@ int Desktop::findWindow(Window window, Window* arr, int size) {
 	return index;
 }
 
-void Desktop::killWindow(Window window) {
-	if(removeWindow(window)) XDestroyWindow(disp, window);
+void Desktop::killCurrentWindow() {
+	if(currFocus != -1) {
+		if(removeWindow(currFocus)) XDestroyWindow(disp, currFocus);
+		this->currFocus = -1;
+	}
 }
 
 bool Desktop::removeWindow(Window window) {
@@ -176,6 +178,10 @@ void Desktop::openProgram(std::string program) {
 }
 
 void Desktop::setCurrentFocusedWindow(Window window) {
+	if(currFocus != -1) {
+		XSetWindowBorder(disp, currFocus, COL_BORDER);
+	}
+	
 	this->currFocus = window;
 	XSetWindowBorder(disp, window, COL_BORDER_SELECTED);
 	

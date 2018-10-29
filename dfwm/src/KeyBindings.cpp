@@ -20,11 +20,11 @@ void KeyBindings::changeDesktop(Dfwm* dfwm, int desktop) {
 }
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
-	int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
+	int key = XLookupKeysym(keyCode, 0) << (keyCode->state);
 
 	std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
-	dfwm->getStatusBar()->setText(keyTxt);
-	dfwm->getStatusBar()->redraw();
+	//dfwm->getStatusBar()->setText(keyTxt);
+	//dfwm->getStatusBar()->redraw();
 
 	if(dfwm->getLauncher()->getState() == HIDING) {
 		if (key == XK_Escape) 			dfwm->quit();
@@ -44,7 +44,9 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 	 	else if (key == (XK_Down << MOD))	changeDesktop(dfwm, false);
 	 	else if (key == (XK_Left << MOD))	changeDesktop(dfwm, false);
 	 	else if (key == (XK_Return << MOD))	dfwm->getLauncher()->show();
+	 	else if (key == (XK_q << MOD))		dfwm->getCurrentDesktop()->killCurrentWindow();
 	 	else if (key == (XK_t << (MOD + CTRL)))	dfwm->getCurrentDesktop()->openProgram("/usr/bin/mate-terminal");
+
 	} else if(dfwm->getLauncher()->getState() == SHOWING) {
 		if(key == XK_Escape)		dfwm->getLauncher()->hide();
 		else if(key == XK_Return) {

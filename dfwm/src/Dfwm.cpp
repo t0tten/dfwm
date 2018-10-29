@@ -58,12 +58,7 @@ Window* Dfwm::findAllWindows(unsigned int &nrOfWindows) {
 
 void Dfwm::init () {
 	this->screen 	= DefaultScreen(disp);
-	this->nrScreens	= ScreenCount(disp);
-	for(int i = 0; i < nrScreens; i++) {
-		this->screenis = ScreenOfDisplay(disp, i);
-		std::cout << "Screen: " << screenis->width << ", " << screenis->height << std::endl;
-	}
-	std::cout << "NrScreens: " << nrScreens << std::endl;
+
 	this->sWidth 	= XDisplayWidth(disp, screen);
 	this->sHeight	= XDisplayHeight(disp, screen);
 	this->root	= RootWindow(disp, screen);	
@@ -77,7 +72,7 @@ void Dfwm::init () {
 	
 	/* Find all open windows */
 	this->size 	= 20;
-	this->nrOfMapped	= 0;
+	this->nrOfMapped= 0;
 	this->mapped	= new Window[size];
 
 	unsigned int nrOfWindows;
@@ -170,7 +165,7 @@ void Dfwm::run () {
 		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
 		//if (e.type == ButtonRelease) 	quit();
 		if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
-		if (e.type == FocusIn)  	std::cout << "FocusIn" << std::endl;
+		if (e.type == FocusIn)  	grabFocused(e.xfocus.window);
 		if (e.type == MappingNotify)  	std::cout << "MappingNotify" << std::endl;
 		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
 		if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
@@ -230,6 +225,7 @@ void Dfwm::drawGraphics(Window window) {
 }
 
 void Dfwm::addWindowToDesktop(Window window) {
+	std::cout << "addWindowToDesktop" << std::endl;
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
 	if(wndAttr.map_state == IsViewable && !isMapped(window)) {
@@ -260,3 +256,37 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 	}
 }
 
+bool Dfwm::windowIsNotDfwm(Window window) {
+	if (window == this->bar->getWindowID()) 		return false;
+	else if (window == this->menu->getWindowID()) 		return false;
+	else if (window == this->launcher->getWindowID()) 	return false;
+	return true;
+}
+
+void Dfwm::grabFocused(Window window) {
+	std::cout << "grabFocused" << std::endl;
+	XWindowAttributes wndAttr;
+	XGetWindowAttributes(disp, window, &wndAttr);
+	if(wndAttr.map_state == IsViewable && windowIsNotDfwm(window)) { // Huh? Too tired right now...
+		Atom type;
+		Atom* atoms;
+		unsigned long len, remain;
+		int form;
+
+		XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+
+		for(int i = 0; i < (int)len; i++) { 
+			std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
+			if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+				char* name;
+				if(XFetchName(disp, window, &name)) {
+					std::string s_name = name;
+					this->bar->setText(s_name);
+				} else this->bar->setText("Window X");
+				this->bar->redraw();
+				this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+			} 
+		}
+	}
+	
+}
