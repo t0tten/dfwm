@@ -1,7 +1,7 @@
 #include "../include/Desktop.h"
 #include <X11/Xatom.h>
 
-Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int height, int wgap, int border, int borderColor) {
+Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int height) {
 	this->disp		= disp;
 	this->x			= x;
 	this->y			= y;
@@ -9,9 +9,7 @@ Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int he
 	this->height		= height;
 	this->root		= parent;
 
-	this->wgap		= wgap;
-	this->border		= border;
-	this->borderColor	= borderColor;
+	this->wgap		= WINDOW_GAP;
 
 	this->size		= 5;
 	this->amountLeft	= 0;
@@ -70,11 +68,13 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	expandArray(arr, size);
 	
 	XSetWindowAttributes wndAttr;
-	wndAttr.border_pixel = border;
+	wndAttr.border_pixel = COL_BORDER;
 	XChangeWindowAttributes(disp, window, CWBorderPixel, &wndAttr);
-
-	XSetWindowBorder(disp, window, borderColor);
 	
+	XWindowChanges wChange;
+	wChange.border_width = BORDER_WIDTH;
+	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
+
 	arr[size] = window;
 	size++;
         XSelectInput(disp, window, EVENT_MASK);
@@ -173,4 +173,13 @@ void Desktop::resizeWindows() {
 void Desktop::openProgram(std::string program) {
 	program += " &";
 	system(program.c_str());
+}
+
+void Desktop::setCurrentFocusedWindow(Window window) {
+	this->currFocus = window;
+	XSetWindowBorder(disp, window, COL_BORDER_SELECTED);
+	
+	XWindowChanges wChange;
+	wChange.border_width = BORDER_WIDTH;
+	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
 }

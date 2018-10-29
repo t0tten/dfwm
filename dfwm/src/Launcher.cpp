@@ -1,6 +1,6 @@
 #include "../include/Launcher.h"
 
-Launcher::Launcher (Display* disp, Window* parent, int color, int textColor) {
+Launcher::Launcher (Display* disp, Window* parent) {
 	this->disp 	= disp;
 	
 	XWindowAttributes wndAttr;
@@ -12,9 +12,6 @@ Launcher::Launcher (Display* disp, Window* parent, int color, int textColor) {
         this->x    	= (wndAttr.width / 2) - (width / 2);
         this->y		= (wndAttr.height / 4) - (height / 2);	
 
-	this->color 	= color;
-	this->textColor = textColor;
-	
 	this->results	= NULL;
 
 	this->launcher	= XCreateSimpleWindow(disp, *parent, x, y, width, height, 0, 0, -1);
@@ -42,10 +39,10 @@ void Launcher::hide() {
 }
 
 void Launcher::draw() {
-	XSetForeground(disp, gc, color);
+	XSetForeground(disp, gc, COL_LAUNCHER_BG);
 	XFillRectangle(disp, launcher, gc, 0, 0, width, height);
 
-	XSetForeground(disp, gc, textColor);
+	XSetForeground(disp, gc, COL_LAUNCHER_FG);
 	if(searchPhrase.length() == 0) {
 		XDrawString(disp, launcher, gc, 20, (height / 2) + 5, "Command...", 10);
 	} else {

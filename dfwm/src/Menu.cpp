@@ -1,9 +1,8 @@
 #include "../include/Menu.h"
 
-Menu::Menu (Display* disp, Window* parent, int diameter, int color, int alignment, int* selected, int maxDesktops) {
+Menu::Menu (Display* disp, Window* parent, int diameter, int* selected, int maxDesktops) {
 	this->disp	= disp;
 	this->selected 	= selected;
-	this->color	= color;
 	this->diameter 	= diameter;
 	this->dd 	= 40;
 	this->nrOfDesktops = maxDesktops;
@@ -16,7 +15,7 @@ Menu::Menu (Display* disp, Window* parent, int diameter, int color, int alignmen
 	
 	std::cout << pWidth << ", " << pHeight << std::endl;
 
-	this->changeAlignment(alignment);
+	this->changeAlignment(MENU_POSITION);
 	this->menu	= XCreateSimpleWindow(disp, *parent, x - (dd / 2), y - (dd / 2), diameter + dd, diameter + dd, 0, 0, 0);
 	this->gc	= XCreateGC(disp, menu, 0, NULL);
 
@@ -52,7 +51,7 @@ void Menu::hide() {
 }
 
 void Menu::draw() {
-	XSetForeground(disp, gc, color);
+	XSetForeground(disp, gc, COL_MENU_BG);
 	XFillArc(disp, menu, gc, dd / 2, dd / 2, diameter, diameter, CIRCLE[0], CIRCLE[1]);
 
 	XSetForeground(disp, gc, COL_MENU_SETTINGS_FG);

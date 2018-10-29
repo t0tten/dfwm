@@ -123,7 +123,7 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
         int action = this->getAction(keyCode);
-        int key = XLookupKeysym(keyCode, 0) << (keyCode->state);
+        int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
 
 	std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
 	dfwm->getStatusBar()->setText(keyTxt);

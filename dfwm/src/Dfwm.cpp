@@ -107,13 +107,13 @@ void Dfwm::init () {
 	this->keys 	= new KeyBindings(disp);
 
 	this->bar 	= new StatusBar(disp, &root, &selected);
-	this->menu 	= new Menu(disp, &root, 150, GRAY, LEFT, &selected, maxDesktops);
+	this->menu 	= new Menu(disp, &root, 150, &selected, maxDesktops);
 	this->bar->redraw();
 	this->desktop	= new Desktop*[maxDesktops];
-	this->launcher	= new Launcher(disp, &root, GRAY, LGT_GRAY);	
+	this->launcher	= new Launcher(disp, &root);	
 
 	for(int i = 0; i < maxDesktops; i++) {
-		this->desktop[i] = new Desktop(disp, &root, 0, bar->getHeight(), sWidth, sHeight, 10, 1, COL_BORDER_COLOR);	
+		this->desktop[i] = new Desktop(disp, &root, 0, bar->getHeight(), sWidth, sHeight);
 	}
 
 	/* Register windows */
@@ -191,15 +191,14 @@ void Dfwm::run () {
 		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
 		if (e.type == ClientMessage) 	addWindowToDesktop(e.xclient.window);
 		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
-
-		if (e.type == ConfigureRequest)std::cout << "ConfigureRequest" << std::endl;
+		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
 		//if (e.type == ButtonRelease) 	quit();
 		if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
 		if (e.type == FocusIn)  	std::cout << "FocusIn" << std::endl;
-		if (e.type == MappingNotify)  std::cout << "MappingNotify" << std::endl;
+		if (e.type == MappingNotify)  	std::cout << "MappingNotify" << std::endl;
 		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
 		if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
-		if (e.type == PropertyNotify) std::cout << "PropertyNotify" << std::endl;
+		if (e.type == PropertyNotify) 	std::cout << "PropertyNotify" << std::endl;
 		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
 
 
