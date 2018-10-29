@@ -167,15 +167,15 @@ void Dfwm::run () {
 		if (e.type == ClientMessage) 	addWindowToDesktop(e.xclient.window);
 		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
 
-		//if (e.type == ConfigureRequest)std::cout << "ConfigureRequest" << std::endl;
-		//if (e.type == ButtonRelease) 	std::cout << "ButtonRelease" << std::endl;
-		//if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
-		//if (e.type == FocusIn)  	std::cout << "FocusIn" << std::endl;
-		//if (e.type == MappingNotify)  std::cout << "MappingNotify" << std::endl;
-		//if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
-		//if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
-		//if (e.type == PropertyNotify) std::cout << "PropertyNotify" << std::endl;
-		//if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
+		if (e.type == ConfigureRequest)std::cout << "ConfigureRequest" << std::endl;
+		if (e.type == ButtonRelease) 	quit();
+		if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
+		if (e.type == FocusIn)  	std::cout << "FocusIn" << std::endl;
+		if (e.type == MappingNotify)  std::cout << "MappingNotify" << std::endl;
+		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
+		if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
+		if (e.type == PropertyNotify) std::cout << "PropertyNotify" << std::endl;
+		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
 	}
 }
 
@@ -233,8 +233,23 @@ void Dfwm::addWindowToDesktop(Window window) {
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
 	if(wndAttr.map_state == IsViewable && !isMapped(window)) {
-		this->desktop[selected - 1]->addWindow(window);
-		addMapped(window);
+		Atom type;
+		Atom* atoms;
+		unsigned long len, remain;
+		int form;
+
+		XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+
+		for(int i = 0; i < (int)len; i++) { 
+			std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
+			if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+
+				this->desktop[selected - 1]->addWindow(window);
+				addMapped(window);
+			} 
+		}
+
+
 	}
 }
 
