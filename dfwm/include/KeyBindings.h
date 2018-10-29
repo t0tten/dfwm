@@ -12,7 +12,6 @@ class KeyBindings {
 	private:
 		void changeDesktop(Dfwm*, bool);
 		void changeDesktop(Dfwm*, int);
-		void openProgram(Dfwm* dfwm);
 	public:
 		KeyBindings ();
 		~KeyBindings ();

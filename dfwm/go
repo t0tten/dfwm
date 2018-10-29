@@ -1,0 +1,2 @@
+xephyr :30 -screen 1024x768&
+make && DISPLAY=:30 ./bin/dfwm

@@ -20,26 +20,9 @@ void KeyBindings::changeDesktop(Dfwm* dfwm, int desktop) {
 	dfwm->getStatusBar()->redraw();
 }
 
-void KeyBindings::openProgram(Dfwm* dfwm) {
-	Window wnd = dfwm->getCurrentDesktop()->openProgram("hej", dfwm->getOpened(), dfwm->getNrOfOpen());
-	std::string txt = std::to_string(wnd);
-	if(wnd != -1) {
-		dfwm->addOpen(wnd);
-		txt += " saved!";
-	} else {
-		txt += " not saved...";
-	}
-
-	dfwm->getStatusBar()->setText(txt);
-	dfwm->getStatusBar()->redraw();
-}
-
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
-	//int keyState = keyCode->state;
 	int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
 
-	//dfwm->getStatusBar()->setText(txt);
-	//dfwm->getStatusBar()->redraw();
 	if (key == XK_Escape) 			dfwm->quit();
 	else if (key == XK_Alt_L) 		dfwm->getMenu()->show();
 	else if (key == (XK_1 << MOD)) 		changeDesktop(dfwm, 1); 
@@ -56,10 +39,7 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
  	else if (key == (XK_Right << MOD))	changeDesktop(dfwm, true);
  	else if (key == (XK_Down << MOD))	changeDesktop(dfwm, false);
  	else if (key == (XK_Left << MOD))	changeDesktop(dfwm, false);
- 	else if (key == (XK_Return << MOD)) {
-                openProgram(dfwm);
-                dfwm->getMenu()->hide();
-        }
+ 	else if (key == (XK_Return << MOD))	dfwm->getCurrentDesktop()->openProgram("/usr/bin/mate-terminal");
 }
 
 void KeyBindings::translate_KeyUp (Dfwm* dfwm, XKeyEvent* keyCode) {
