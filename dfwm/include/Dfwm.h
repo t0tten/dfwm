@@ -27,8 +27,8 @@ class Dfwm {
 		Desktop** desktop;
 		
 		int size;
-		int nrOfOpen;
-		Window* opened;
+		int nrOfMapped;
+		Window* mapped;
 
 		int screen;
 		int nrScreens;
@@ -40,6 +40,10 @@ class Dfwm {
 		
 		void init();
 		Window* findAllWindows(unsigned int&);
+		bool isMapped(Window);
+		void drawGraphics(Window);
+		void addWindowToDesktop(Window);
+		void removeWindowFromDesktop(Window);
 
 	public:
 		Dfwm();
@@ -57,10 +61,10 @@ class Dfwm {
 		StatusBar* getStatusBar();
 		Desktop* getCurrentDesktop();
 		
-		void addOpen(Window);
-		void removeOpen(Window);
-		Window* getOpened();
-		int getNrOfOpen();
+		void addMapped(Window);
+		void removeMapped(Window);
+		Window* getMappedList();
+		int getNrOfMapped();
 
 };
 

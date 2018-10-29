@@ -1,7 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Name=Dfwm
-Comment=Damn Fine Window Manager
-Exec=dfwm
-Icon=dfwm
-Type=XSession

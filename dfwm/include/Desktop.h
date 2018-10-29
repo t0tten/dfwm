@@ -36,13 +36,6 @@ class Desktop {
 		void resizeWindows();
 		void addWindow(Window, Window*&, int&);
 
-
-		
-		Window* get_win_list_stacked(unsigned long*);
-		int minimized_window(Window);
-		int is_skip_taskbar_or_pager_set(Window);
-		Window get_top_window_from_stack();
-
 	public:
 		Desktop(Display*, Window*, int, int, int, int, int, int, int);
 		~Desktop();
@@ -56,9 +49,9 @@ class Desktop {
 		void moveToRight(Window);
 
 		void addWindow(Window);
-		void removeWindow(Window);
-		Window openProgram(std::string, Window*, int);
-		Window findAllWindows(Window*, int);
+		void killWindow(Window);
+		bool removeWindow(Window);
+		void openProgram(std::string);
 };
 
 #endif //_DESKTOP_

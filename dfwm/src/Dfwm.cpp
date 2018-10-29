@@ -76,8 +76,8 @@ void Dfwm::init () {
 	
 	/* Find all open windows */
 	this->size 	= 20;
-	this->nrOfOpen	= 0;
-	this->opened	= new Window[size];
+	this->nrOfMapped	= 0;
+	this->mapped	= new Window[size];
 
 	unsigned int nrOfWindows;
 	Window* windows = findAllWindows(nrOfWindows);
@@ -86,7 +86,6 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	//KeyCode code;
 	XGrabKey(disp, code, AnyKey, root,
         	True, GrabModeAsync, GrabModeAsync);
 
@@ -105,70 +104,73 @@ void Dfwm::init () {
 		this->desktop[i] = new Desktop(disp, &root, 0, bar->getHeight(), sWidth, sHeight, 10, 1, COL_BORDER_COLOR);	
 	}
 
-	addOpen(bar->getWindowID());
-	addOpen(menu->getWindowID());		
+	addMapped(bar->getWindowID());
+	addMapped(menu->getWindowID());		
 
 	/* Assign all found windows to a desktop */
 	for(int i = 0; i < nrOfWindows; i++) {
-		/* REMOVE WHEN TESTING */
-		//this->desktop[selected - 1]->addWindow(windows[i]);
-		addOpen(windows[i]);
+		this->desktop[selected - 1]->addWindow(windows[i]);
+		addMapped(windows[i]);
 	}
 
-	//this->desktop[selected - 1]->openProgram("hej", opened, nrOfOpen);
 	delete[] windows;
 	this->desktop[selected - 1]->show();
 }
 
-void Dfwm::addOpen(Window window) {
-	if(size <= nrOfOpen) {
+void Dfwm::addMapped(Window window) {
+	if(size <= nrOfMapped) {
 		size *= 2;
 		Window* tmp = new Window[size];
-		for(int i = 0; i < nrOfOpen; i++) {
-			tmp[i] = opened[i];
+		for(int i = 0; i < nrOfMapped; i++) {
+			tmp[i] = mapped[i];
 		}
 
-		delete[] opened;
-		opened = NULL;
-		opened = tmp;
+		delete[] mapped;
+		mapped = NULL;
+		mapped = tmp;
 	}
 	
-	opened[nrOfOpen++] = window;
+	mapped[nrOfMapped++] = window;
 }
 
-void Dfwm::removeOpen(Window window) {
+void Dfwm::removeMapped(Window window) {
+	bool found = false;
+	int index = 0;
+	for(; index < nrOfMapped && !found; index++) {
+		if(window == mapped[index]) {
+			found = true;
+			break;
+		}
+	}
 
+	if(found) {
+		for(int i = index; i < (nrOfMapped - 1); i++) {
+			mapped[i] = mapped[i + 1];	
+		}
+
+		nrOfMapped--;
+	}
+	
 }
 
 void Dfwm::run () {
 	while(running) {
 		XNextEvent (disp, &e);
-		
-		Window wnd = this->desktop[selected - 1]->findAllWindows(this->opened, this->nrOfOpen);
-		if(wnd != -1) {
-			this->desktop[selected - 1]->addWindow(wnd);
-			this->addOpen(wnd);
-		}		
+		if (e.type == Expose)		drawGraphics(e.xexpose.window);
+		if (e.type == KeyPress) 	keys->translate_KeyDown(this, &e.xkey);
+		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
+		if (e.type == ClientMessage) 	addWindowToDesktop(e.xclient.window);
+		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
 
-		//std::cout << "Event" << std::endl;
-		if (e.type == Expose) {
-			//std::cout << "Expose" << std::endl;
-			if(e.xexpose.window == bar->getWindowID()) bar->draw();
-			if(e.xexpose.window == menu->getWindowID()) menu->draw();
-		}
-		if (e.type == KeyPress) {
-			//std::cout << "KeyPress" << std::endl;
-			keys->translate_KeyDown(this, &e.xkey);
-		}
-		if (e.type == KeyRelease) keys->translate_KeyUp(this, &e.xkey);
-		if (e.type == ButtonRelease) std::cout << "ButtonRelease" << std::endl;
-		if (e.type == PropertyNotify) {
-			std::cout << "PropertyNotify" << std::endl;
-			std::string txt = "PropertyNotify";
-
-			this->bar->setText(txt);	
-			this->bar->redraw();
-		}
+		//if (e.type == ConfigureRequest)std::cout << "ConfigureRequest" << std::endl;
+		//if (e.type == ButtonRelease) 	std::cout << "ButtonRelease" << std::endl;
+		//if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
+		//if (e.type == FocusIn)  	std::cout << "FocusIn" << std::endl;
+		//if (e.type == MappingNotify)  std::cout << "MappingNotify" << std::endl;
+		//if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
+		//if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
+		//if (e.type == PropertyNotify) std::cout << "PropertyNotify" << std::endl;
+		//if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
 	}
 }
 
@@ -203,5 +205,35 @@ Menu* Dfwm::getMenu() { return this->menu; }
 StatusBar* Dfwm::getStatusBar() { return this->bar; }
 Desktop* Dfwm::getCurrentDesktop() { return this->desktop[selected - 1]; }
 
-Window* Dfwm::getOpened() { return this->opened; }
-int Dfwm::getNrOfOpen() { return this->nrOfOpen; }
+Window* Dfwm::getMappedList() { return this->mapped; }
+int Dfwm::getNrOfMapped() { return this->nrOfMapped; }
+
+bool Dfwm::isMapped(Window wnd) {
+	bool found = false;
+	for(int i = 0; i < nrOfMapped && !found; i++) {
+		if(mapped[i] == wnd) { found = true; break; }
+	}
+
+	return found;
+}
+
+void Dfwm::drawGraphics(Window window) {	
+	if(window == bar->getWindowID()) bar->draw();
+	else if(window == menu->getWindowID()) menu->draw();
+}
+
+void Dfwm::addWindowToDesktop(Window window) {
+	XWindowAttributes wndAttr;
+	XGetWindowAttributes(disp, window, &wndAttr);
+	if(wndAttr.map_state == IsViewable && !isMapped(window)) {
+		this->desktop[selected - 1]->addWindow(window);
+		addMapped(window);
+	}
+}
+
+void Dfwm::removeWindowFromDesktop(Window window) {
+	if(isMapped(window)) {
+		removeMapped(window);
+		this->desktop[selected - 1]->removeWindow(window);
+	}
+}
