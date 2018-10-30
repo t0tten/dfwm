@@ -14,7 +14,7 @@ Launcher::Launcher (Display* disp, Window* parent) {
 
 	this->launcher	= XCreateSimpleWindow(disp, *parent, x, y, width, height, 0, 0, COL_LAUNCHER_BG);
 	this->gc 	= XCreateGC(disp, launcher, 0, NULL);
-	this->autoCorrectIndex = 0;
+	this->autoCorrectIndex = -1;
 
 	this->setState(HIDING);
 }
@@ -35,7 +35,7 @@ void Launcher::hide() {
 	this->searchPhrase = "";
 	this->files.clear();
 	this->results.clear();
-	this->autoCorrectIndex = 0;
+	this->autoCorrectIndex = -1;
 	this->setState(HIDING);
 	XUnmapWindow(disp, launcher);
 }
@@ -55,15 +55,18 @@ void Launcher::draw() {
 		XDrawString(disp, launcher, gc, 20, (height / 2) + 5, searchPhrase.c_str(), searchPhrase.length());
 	}
 
-	for(int i = 0; i < size; i++) {
-		XSetForeground(disp, gc, COL_LAUNCHER_RESULT_BG);
-        	XFillRectangle(disp, launcher, gc, 5, height + (25 * i), width - 10, 20);
+	//if(autoCorrectIndex != -1) {
+		for(int i = 0; i < size; i++) {
+			if(autoCorrectIndex >= 0 && i == autoCorrectIndex) 	XSetForeground(disp, gc, COL_LAUNCHER_RESULT_SEL_BG);
+			else				XSetForeground(disp, gc, COL_LAUNCHER_RESULT_BG);
+        		XFillRectangle(disp, launcher, gc, 5, height + (25 * i), width - 10, 20);
 		
-		XSetForeground(disp, gc, COL_LAUNCHER_RESULT_FG);
-		if(results.size() > i) {
-			XDrawString(disp, launcher, gc, 20, height + 13 + (25 * i), results.at(i).c_str(), results.at(i).length());
+			XSetForeground(disp, gc, COL_LAUNCHER_RESULT_FG);
+			if(results.size() > i) {
+				XDrawString(disp, launcher, gc, 20, height + 13 + (25 * i), results.at(i).c_str(), results.at(i).length());
+			}
 		}
-	}
+	//}
 }
 
 void Launcher::redraw() {
@@ -112,9 +115,9 @@ bool Launcher::fetchFiles(std::string path) {
 
 void Launcher::autoComplete() {
 	if(this->results.size() > 0) {
-		this->searchPhrase = this->results.at(autoCorrectIndex);
 		autoCorrectIndex++;
 		if(autoCorrectIndex >= results.size() || autoCorrectIndex >= 10) autoCorrectIndex = 0;
+		if(autoCorrectIndex >= 0) this->searchPhrase = this->results.at(autoCorrectIndex);
 	}
 }
 
@@ -130,7 +133,7 @@ void Launcher::getPaths() {
 
 void Launcher::search() {
 	/* Used to search in path after suggestions */
-	this->autoCorrectIndex = 0;
+	this->autoCorrectIndex = -1;
 	this->results.clear();
 	if(searchPhrase.length() != 0) {
 		for(int i = 0; i < files.size(); i++) {

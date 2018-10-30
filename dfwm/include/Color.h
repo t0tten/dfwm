@@ -6,7 +6,8 @@ static int WHITE 	= -1;
 static int GRAY 	= 0x222222;
 static int LGT_GRAY	= 0xcccccc;
 static int LGT_GRAY2	= 0xaaaaaa;
-static int MEDIUM_GRAY	= 0x444444;
+static int MEDIUM_GRAY	= 0x555555;
+static int MEDIUM_GRAY2	= 0x333333;
 static int YELLOW	= 0xe9b400;
 
 #endif //_COLORS_
