@@ -166,6 +166,19 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			std::string converted = XKeysymToString(keysym);
                         LOGGER_DEBUGF("converted %s", converted.c_str());
 
+			if(converted == "slash") converted = "/";
+			if(converted == "comma") converted = ",";
+			if(converted == "period") converted = ".";
+			if(converted == "backslash") converted = "\\";
+			if(converted == "bracketright") converted = "]";
+			if(converted == "bracketleft") converted = "[";
+			if(converted == "equal") converted = "=";
+			if(converted == "minus") converted = "-";
+			if(converted == "plus") converted = "+";
+			if(converted == "apostrophe") converted = "'";
+			if(converted == "semicolon") converted = ";";
+			if(converted == "grave") converted = "'";
+
 			if(converted.length() == 1) {
 				dfwm->getLauncher()->addChar(converted);
 				dfwm->getLauncher()->draw();
