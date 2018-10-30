@@ -45,7 +45,7 @@ class Launcher {
 		void draw();
 		void redraw();
 	
-		void addChar(char*);
+		void addChar(std::string);
 		void removeLastChar();
 
 		Window getLauncherWindow();

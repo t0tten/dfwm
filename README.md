@@ -11,6 +11,8 @@
 * Minimize functionality?
 
 ### Launcher
+* Launcher should get focus when opened
+* Launcher should close when it loose focus
 
 ### Statusbar
 * Clickable infos
