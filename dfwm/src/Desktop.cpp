@@ -23,8 +23,28 @@ Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int he
 
 Desktop::~Desktop () {
 	std::cout << "Desktop::~Desktop" << std::endl;
-	for(int i = 0; i < amountLeft; i++)	XDestroyWindow(disp, left[i]);
-	for(int i = 0; i < amountRight; i++)	XDestroyWindow(disp, right[i]);
+		/*Atom DELETE 	= XInternAtom(disp, "WM_DELETE_WINDOW", False);
+		Atom PROTO 	= XInternAtom(disp, "WM_PROTOCOLS", True);	
+	
+		XEvent eKill;
+		eKill.xclient.type = ClientMessage;
+		eKill.xclient.message_type = XInternAtom(disp, "WM_PROTOCOLS", true);
+		eKill.xclient.format = 32;
+		eKill.xclient.data.l[0] = XInternAtom(disp, "WM_DELETE_WINDOW", false);
+		eKill.xclient.data.l[1] = CurrentTime;
+		*/
+
+	for(int i = 0; i < amountLeft; i++) {
+		XDestroyWindow(disp, left[i]);
+		//eKill.xclient.window = left[i];
+		//XSendEvent(disp, left[i], False, NoEventMask, &eKill);
+	}
+	for(int i = 0; i < amountRight; i++) {
+		XDestroyWindow(disp, right[i]);
+		//eKill.xclient.window = left[i];
+		//XSendEvent(disp, left[i], False, NoEventMask, &eKill);
+	}
+
 	delete[] left;
 	delete[] right;
 }
@@ -82,7 +102,7 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
 
 	arr[size] = window;
 	size++;
-	XSelectInput(disp, window, EVENT_MASK);
+        XSelectInput(disp, window, EVENT_MASK);
 }
 
 void Desktop::addWindow(Window window) {

@@ -70,6 +70,9 @@ class Dfwm {
 		int getNrOfMapped();
 		void grabFocused(Window, int);
 
+                Display* getDisplay();
+                Window getRoot();
+
 };
 
 #endif //_DFWM_
