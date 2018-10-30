@@ -16,6 +16,7 @@ class KeyBindings {
 
                 int getAction(XKeyEvent* keyCode);
                 void executeAction(Dfwm* dfwm, int action);
+                int unmask(int n);
 	public:
 		KeyBindings (Display*);
 		~KeyBindings ();

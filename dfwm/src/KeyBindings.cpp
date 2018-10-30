@@ -47,12 +47,19 @@ void KeyBindings::setup(Dfwm* dfwm) {
         }
 }
 
+/* Unset the CapsLock, NumLock, SrollLock modifiers */
+int KeyBindings::unmask(int n) {
+        n &= ~(1UL << 1); // CapsLock
+        n &= ~(1UL << 4); // NumLock
+        n &= ~(1UL << 5); // ScrollLock
+        return n;
+}
+
 int KeyBindings::getAction(XKeyEvent* keyCode) {
-        unsigned int val = XLookupKeysym(keyCode, 0) << (keyCode->state);
+        unsigned int val = XLookupKeysym(keyCode, 0) << unmask(keyCode->state);
 
         for (int i=0; i < NUM_HOTKEYS; i++) {
-                if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val ||
-                     (hotkeys[i].key << (hotkeys[i].modifier | NUM)) == val) {
+                if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val) {
                         return hotkeys[i].action;
                 }
         }
