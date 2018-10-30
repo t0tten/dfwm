@@ -1,4 +1,5 @@
 #include "../include/KeyBindings.h" 
+#include "../include/logger.h"
 #include "../Config.h"
 
 #define CTRL 4
@@ -48,9 +49,6 @@ void KeyBindings::setup(Dfwm* dfwm) {
 
 int KeyBindings::getAction(XKeyEvent* keyCode) {
         unsigned int val = XLookupKeysym(keyCode, 0) << (keyCode->state);
-
-        std::cout << "val=" << val << std::endl;
-        std::cout << "hotkeys=" << NUM_HOTKEYS << std::endl;
 
         for (int i=0; i < NUM_HOTKEYS; i++) {
                 if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val ||
@@ -113,14 +111,14 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                         dfwm->getLauncher()->show();
                         break;
                 case ACTION_KILL_ACTIVE:
-                        std::cout << "Killing window" << std::endl;
+                        LOGGER_INFO("Killing window");
 			dfwm->getCurrentDesktop()->killCurrentWindow();
                         break;
                 case ACTION_DMENU:
                         dfwm->getCurrentDesktop()->openProgram(DMENU);
                         break;
                 default:
-                        std::cout << "err: unknown action" << std::endl;
+                        LOGGER_INFO("err: unknown action");
                         break;
         }
 }
