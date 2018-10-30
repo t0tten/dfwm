@@ -20,13 +20,8 @@
 * A bit off - not really in the middle
 * Some sort of color indication that a desktop has windows
 
-### Keybindings
-* Keyboard not registered when NUMLOCK is off
-* Keyboard not registered when CAPLOCK is on
-
 ### Config
 * Read configurations from file
-
 
 ## Previous fixes:
 
@@ -44,5 +39,7 @@
 ### Menu
 
 ### Keybindings
+* Keyboard not registered when NUMLOCK is off
+* Keyboard not registered when CAPLOCK is on
 
 ### Config
