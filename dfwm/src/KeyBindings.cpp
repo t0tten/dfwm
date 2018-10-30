@@ -157,9 +157,12 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
 		} else {
-			dfwm->getLauncher()->addChar(XKeysymToString(key));
-			dfwm->getLauncher()->draw();
-			dfwm->getLauncher()->redraw();
+			std::string converted = XKeysymToString(key);
+			if(converted.length() == 1) {
+				dfwm->getLauncher()->addChar(converted);
+				dfwm->getLauncher()->draw();
+				dfwm->getLauncher()->redraw();
+			}
 		}
 	}
 }
