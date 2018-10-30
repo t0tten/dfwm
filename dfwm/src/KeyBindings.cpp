@@ -139,7 +139,8 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
         int action = this->getAction(keyCode);
-        int key = XLookupKeysym(keyCode, 0); 
+
+        int key = XLookupKeysym(keyCode, 0);
 
 	if(dfwm->getLauncher()->getState() == HIDING) {
                 this->executeAction(dfwm, action);
@@ -157,7 +158,14 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
 		} else {
-			std::string converted = XKeysymToString(key);
+
+                        char text[32] = {};
+                        XComposeStatus status;
+                        KeySym keysym = NoSymbol;
+                        XLookupString(keyCode, text, sizeof(text)-1, &keysym, &status);
+			std::string converted = XKeysymToString(keysym);
+                        LOGGER_DEBUGF("converted %s", converted.c_str());
+
 			if(converted.length() == 1) {
 				dfwm->getLauncher()->addChar(converted);
 				dfwm->getLauncher()->draw();
