@@ -16,7 +16,6 @@ class Dfwm {
 	private:
 		/* X11 */
 		Display* disp;
-		Screen* screenis;
 		Window root;
 
 		XEvent e;
@@ -33,7 +32,6 @@ class Dfwm {
 		Window* mapped;
 
 		int screen;
-		int nrScreens;
 		int sWidth, sHeight;
 		int selected;
 		int maxDesktops;
@@ -43,8 +41,10 @@ class Dfwm {
 		void init();
 		Window* findAllWindows(unsigned int&);
 		bool isMapped(Window);
+		bool windowIsNotDfwm(Window);
 		void drawGraphics(Window);
 		void addWindowToDesktop(Window);
+		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
 
 	public:
@@ -68,6 +68,7 @@ class Dfwm {
 		void removeMapped(Window);
 		Window* getMappedList();
 		int getNrOfMapped();
+		void grabFocused(Window, int);
 
                 Display* getDisplay();
                 Window getRoot();

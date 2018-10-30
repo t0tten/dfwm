@@ -5,7 +5,7 @@
 
 enum Alignment {CENTER, LEFT, RIGHT};
 enum LauncherState {SHOWING, HIDING};
-static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask | FocusChangeMask;
+static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask | FocusChangeMask | EnterWindowMask | PointerMotionMask;
 static long ROOT_EVENT_MASK		= SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask| FocusChangeMask;
 static int COL_SELECTED_BG 		= YELLOW;
 static int COL_SELECTED_FG 		= BLACK;
