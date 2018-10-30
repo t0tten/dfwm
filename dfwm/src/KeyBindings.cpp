@@ -114,6 +114,7 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                         break;
                 case ACTION_KILL_ACTIVE:
                         std::cout << "Killing window" << std::endl;
+			dfwm->getCurrentDesktop()->killCurrentWindow();
                         break;
                 case ACTION_DMENU:
                         dfwm->getCurrentDesktop()->openProgram(DMENU);
@@ -129,8 +130,8 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
         int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
 
 	std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
-	dfwm->getStatusBar()->setText(keyTxt);
-	dfwm->getStatusBar()->redraw();
+	//dfwm->getStatusBar()->setText(keyTxt);
+	//dfwm->getStatusBar()->redraw();
 
 	if(dfwm->getLauncher()->getState() == HIDING) {
                 this->executeAction(dfwm, action);
