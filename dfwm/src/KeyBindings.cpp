@@ -23,27 +23,37 @@ void KeyBindings::changeDesktop(Dfwm* dfwm, int desktop) {
 	dfwm->getStatusBar()->redraw();
 }
 
+void KeyBindings::setupGrabKey(Dfwm* dfwm, unsigned int key, unsigned int modifier) {
+        XGrabKey(
+                dfwm->getDisplay(),
+                XKeysymToKeycode(dfwm->getDisplay(), key),
+                modifier,
+                dfwm->getRoot(),
+                true,
+                GrabModeAsync,
+                GrabModeAsync);
+}
+
 void KeyBindings::setup(Dfwm* dfwm) {
         for (int i=0; i < NUM_HOTKEYS; i++) {
-                /* Setup hotkey */
-                XGrabKey(
-                        dfwm->getDisplay(),
-                        XKeysymToKeycode(dfwm->getDisplay(), hotkeys[i].key),
-                        hotkeys[i].modifier,
-                        dfwm->getRoot(),
-                        true,
-                        GrabModeAsync,
-                        GrabModeAsync);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier);
 
-                /* Setup hotkey for when numlock is active */
-                XGrabKey(
-                        dfwm->getDisplay(),
-                        XKeysymToKeycode(dfwm->getDisplay(), hotkeys[i].key),
-                        hotkeys[i].modifier | NUM,
-                        dfwm->getRoot(),
-                        true,
-                        GrabModeAsync,
-                        GrabModeAsync);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | LockMask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod3Mask);
+
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | LockMask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | Mod3Mask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | LockMask | Mod3Mask);
+
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | Mod3Mask | LockMask);
         }
 }
 
