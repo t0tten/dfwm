@@ -158,7 +158,6 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
 		} else {
-
                         char text[32] = {};
                         XComposeStatus status;
                         KeySym keysym = NoSymbol;
@@ -166,17 +165,12 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
                         keyCode->state &= ~ControlMask;
 
                         XLookupString(keyCode, text, sizeof(text)-1, &keysym, &status);
-			std::string converted = XKeysymToString(keysym);
-                        LOGGER_DEBUGF("%s", text);
-                        LOGGER_DEBUGF("converted %s", converted.c_str());
-                        std::string s;
-                        s.push_back(text[0]);
-
+                        
                         if(text[0] >= 0x20 && text[0] <= 0x7e) {
-				dfwm->getLauncher()->addChar(s);
+				dfwm->getLauncher()->addChar(text[0]);
 				dfwm->getLauncher()->draw();
 				dfwm->getLauncher()->redraw();
-                                }
+                       }
 		}
 	}
 }

@@ -76,16 +76,9 @@ void Launcher::redraw() {
         XSendEvent(disp, launcher, False, ExposureMask, &exp);
 }
 
-void Launcher::addChar(std::string toAdd) {
-	if(toAdd == "slash") 		this->searchPhrase += "/";
-	else if(toAdd == "semicolon") 	this->searchPhrase += ";";
-	else if(toAdd == "equal") 	this->searchPhrase += "=";
-	else if(toAdd == "backslash") 	this->searchPhrase += "\\";
-	else if(toAdd == "space") 	this->searchPhrase += " ";
-	else if(toAdd == "minus") 	this->searchPhrase += "-";
-	else if(toAdd.length() == 1)	this->searchPhrase += toAdd;
-
-	if(toAdd != "tab") this->search();	
+void Launcher::addChar(char toAdd) {
+        this->searchPhrase += toAdd;
+        this->search();
 	this->redraw();
 }
 
