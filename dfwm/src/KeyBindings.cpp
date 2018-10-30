@@ -121,9 +121,6 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                         LOGGER_INFO("Killing window");
 			dfwm->getCurrentDesktop()->killCurrentWindow();
                         break;
-                case ACTION_DMENU:
-                        dfwm->getCurrentDesktop()->openProgram(DMENU);
-                        break;
                 default:
                         LOGGER_INFO("err: unknown action");
                         break;
