@@ -44,6 +44,7 @@ class Dfwm {
 		bool windowIsNotDfwm(Window);
 		void drawGraphics(Window);
 		void addWindowToDesktop(Window);
+		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
 
 	public:
@@ -67,7 +68,7 @@ class Dfwm {
 		void removeMapped(Window);
 		Window* getMappedList();
 		int getNrOfMapped();
-		void grabFocused(Window);
+		void grabFocused(Window, int);
 
 };
 

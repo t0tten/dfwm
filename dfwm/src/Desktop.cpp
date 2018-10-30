@@ -22,6 +22,7 @@ Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int he
 }
 
 Desktop::~Desktop () {
+	std::cout << "Desktop::~Desktop" << std::endl;
 	for(int i = 0; i < amountLeft; i++)	XDestroyWindow(disp, left[i]);
 	for(int i = 0; i < amountRight; i++)	XDestroyWindow(disp, right[i]);
 	delete[] left;
@@ -29,11 +30,13 @@ Desktop::~Desktop () {
 }
 
 void Desktop::show() {
+	std::cout << "void Desktop::show()" << std::endl;
 	for(int i = 0; i < amountLeft; i++) 	XMapWindow(disp, left[i]);
 	for(int i = 0; i < amountRight; i++) 	XMapWindow(disp, right[i]);
 }
 
 void Desktop::hide() {
+	std::cout << "void Desktop::hide() {" << std::endl;
 	for(int i = 0; i < amountRight; i++) 	XUnmapWindow(disp, right[i]);
 	for(int i = 0; i < amountLeft; i++)	XUnmapWindow(disp, left[i]);
 }
@@ -41,6 +44,7 @@ void Desktop::hide() {
 void Desktop::redraw() {}
 
 void Desktop::moveToLeft(Window window) {
+	std::cout << "void Desktop::moveToLeft(Window window)" << std::endl;
 	int index = findWindow(window, right, amountRight);
 	/* If the window is found */
 	if(index != -1) {
@@ -53,6 +57,7 @@ void Desktop::moveToLeft(Window window) {
 }
 
 void Desktop::moveToRight(Window window) {
+	std::cout << "void Desktop::moveToRight(Window window)" << std::endl;
 	int index = findWindow(window, left, amountLeft);
 	/* If the window is found */
 	if(index != -1) {
@@ -67,6 +72,7 @@ void Desktop::moveToRight(Window window) {
 }
 
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
+	std::cout << "void Desktop::addWindow(Window window, Window*& arr, int& size)" << std::endl;
 	expandArray(arr, size);
 	XSetWindowBorder(disp, window, COL_BORDER);
 	
@@ -80,12 +86,14 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
 }
 
 void Desktop::addWindow(Window window) {
+	std::cout << "void Desktop::addWindow(Window window)" << std::endl;
 	if(amountLeft <= 0) 	addWindow(window, left, amountLeft);
 	else  			addWindow(window, right, amountRight);
 	resizeWindows();
 }
 
 int Desktop::findWindow(Window window, Window* arr, int size) {
+	std::cout << "int Desktop::findWindow(Window window, Window* arr, int size)" << std::endl;
 	bool found = false;
 	int index = -1;
 	for(int i = 0; i < size && !found; i++) {
@@ -100,40 +108,62 @@ int Desktop::findWindow(Window window, Window* arr, int size) {
 }
 
 void Desktop::killCurrentWindow() {
+	std::cout << "void Desktop::killCurrentWindow()" << std::endl;
 	if(currFocus != -1) {
-		if(removeWindow(currFocus)) XDestroyWindow(disp, currFocus);
-		this->currFocus = -1;
+		std::cout << "TRYING TO KILL" << std::endl;
+		Atom DELETE 	= XInternAtom(disp, "WM_DELETE_WINDOW", False);
+		Atom PROTO 	= XInternAtom(disp, "WM_PROTOCOLS", True);	
+		
+		XEvent eKill;
+		eKill.xclient.type = ClientMessage;
+		eKill.xclient.window = currFocus;
+		eKill.xclient.message_type = XInternAtom(disp, "WM_PROTOCOLS", true);
+		eKill.xclient.format = 32;
+		eKill.xclient.data.l[0] = XInternAtom(disp, "WM_DELETE_WINDOW", false);
+		eKill.xclient.data.l[1] = CurrentTime;
+		XSendEvent(disp, currFocus, False, NoEventMask, &eKill);
+
+		//XDestroyWindow(disp, currFocus);
 	}
 }
 
 bool Desktop::removeWindow(Window window) {
-	/* Search left side */
-	int index	= -1;
-	bool isLeft	= true;
-	index = findWindow(window, left, amountLeft);
+	std::cout << "bool Desktop::removeWindow(Window window)" << std::endl;
+	std::cout << "removeWindow: " << window << std::endl;
+	if(window != 0) {
+		/* Search left side */
+		int index	= -1;
+		bool isLeft	= true;
+		index = findWindow(window, left, amountLeft);
 
-	/* If not found, search right side */
-	if(index == -1) {
-		index = findWindow(window, right, amountRight);
-		isLeft = false;
-	}
+		/* If not found, search right side */
+		if(index == -1) {
+			index = findWindow(window, right, amountRight);
+			isLeft = false;
+		}
 
-	/* Remove from array if found */
-	if(index != -1) {
-		if(isLeft) {
-			for(int i = index; i < (amountLeft - 1); i++) left[i] = left[i + 1];
-			amountLeft--;
-		} else {
-			for(int i = index; i < (amountRight - 1); i++) right[i] = right[i + 1];
-			amountRight--;
-		}		
-		
-		if(amountLeft <= 0 && amountRight > 0) moveToLeft(right[0]);
-		resizeWindows();
+		/* Remove from array if found */
+		if(index != -1) {
+			if(window == currFocus) currFocus = -1;
+			if(isLeft) {
+				std::cout << "Found in left column" << std::endl;
+				for(int i = index; i < (amountLeft - 1); i++) left[i] = left[i + 1];
+				amountLeft--;
+			} else {
+				std::cout << "Found in right column" << std::endl;
+				for(int i = index; i < (amountRight - 1); i++) right[i] = right[i + 1];
+				amountRight--;
+			}		
+					
+			std::cout << "amountLeft: " << amountLeft << ", amountRight: " << amountRight << std::endl;
+			if(amountLeft <= 0 && amountRight > 0) moveToLeft(right[0]);
+			resizeWindows();
+		}
 	}
 }
 
 void Desktop::expandArray(Window*& arr, int amount) {
+	std::cout << "void Desktop::expandArray(Window*& arr, int amount)" << std::endl;
 	if(size <= amount) {
 		size *= 2;
 		Window* tmp = new Window[size];
@@ -145,8 +175,11 @@ void Desktop::expandArray(Window*& arr, int amount) {
 }
 
 void Desktop::resizeWindows() {
+	std::cout << "void Desktop::resizeWindows()" << std::endl; 
+	std::cout << "amountLeft: " << amountLeft << ", amountRight: " << amountRight << std::endl;
 	/* Resize windows on the left side */
 	if(amountLeft > 0) {
+		std::cout << "Enter resize left" << std::endl;
 		int wX		= x + wgap;
 		int wY		= y + wgap;
 		int wWidth 	= (amountRight == 0) ? width - (2 * wgap) : (width / 2) - (2 * wgap); 
@@ -160,6 +193,7 @@ void Desktop::resizeWindows() {
 
 	/* Resize windows on the right side */
 	if(amountRight > 0) {
+		std::cout << "Enter resize right" << std::endl;
 		int wX		= (width / 2);
 		int wY		= y + wgap;
 		int wWidth 	= (width / 2) - wgap; 
@@ -173,11 +207,13 @@ void Desktop::resizeWindows() {
 }
 
 void Desktop::openProgram(std::string program) {
+	std::cout << "void Desktop::openProgram(std::string program)" << std::endl;
 	program += " &";
 	system(program.c_str());
 }
 
 void Desktop::setCurrentFocusedWindow(Window window) {
+	std::cout << "Desktop::setCurrentFocusedWindow(Window window)" << std::endl;
 	if(currFocus != -1) {
 		XSetWindowBorder(disp, currFocus, COL_BORDER);
 	}

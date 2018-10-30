@@ -11,6 +11,7 @@ Dfwm::Dfwm (std::string displayName) {
 }
 
 Dfwm::~Dfwm () {
+	std::cout << "Calls destructor" << std::endl;
 	XUngrabKey(disp, code, AnyKey, root);
 	XCloseDisplay(disp);
 	delete this->keys;
@@ -153,22 +154,31 @@ void Dfwm::removeMapped(Window window) {
 	
 }
 
+void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
+	std::cout << "MESSAGE TYPE: " << XGetAtomName(disp, xclient.message_type) << std::endl;
+	Atom NET_WM_STATE = XInternAtom(disp, "_NET_WM_STATE", True); 
+	if(xclient.message_type == NET_WM_STATE) {
+		std::cout << "It is a net wm state!" << std::endl;
+		addWindowToDesktop(xclient.window);
+	}
+}
+
 void Dfwm::run () {
 	while(running) {
 		XNextEvent (disp, &e);
 		if (e.type == Expose)		drawGraphics(e.xexpose.window);
 		if (e.type == KeyPress) 	keys->translate_KeyDown(this, &e.xkey);
 		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
-		if (e.type == ClientMessage) 	addWindowToDesktop(e.xclient.window);
+		if (e.type == ClientMessage) 	translateClientMessage(e.xclient);
 		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
 
 		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
 		//if (e.type == ButtonRelease) 	quit();
-		if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
-		if (e.type == FocusIn)  	grabFocused(e.xfocus.window);
+		if (e.type == EnterNotify)  	grabFocused(e.xcrossing.window, e.xcrossing.mode);
+		if (e.type == FocusIn)  	grabFocused(e.xfocus.window, e.xfocus.mode);
 		if (e.type == MappingNotify)  	std::cout << "MappingNotify" << std::endl;
 		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
-		if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
+		//if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
 		if (e.type == PropertyNotify) 	std::cout << "PropertyNotify" << std::endl;
 		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
 	}
@@ -257,36 +267,60 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 }
 
 bool Dfwm::windowIsNotDfwm(Window window) {
-	if (window == this->bar->getWindowID()) 		return false;
-	else if (window == this->menu->getWindowID()) 		return false;
-	else if (window == this->launcher->getWindowID()) 	return false;
+	if (window == this->bar->getWindowID()) {
+		std::cout << "Window is bar" << std::endl;
+ 		return false;
+	}
+	else if (window == this->menu->getWindowID()) {
+		std::cout << "Window is menu" << std::endl;
+		return false; 
+	}
+	else if (window == this->launcher->getWindowID()) { 
+		std::cout << "Window is launcher" << std::endl;
+		return false;
+	}
+	else if (window == this->root) {
+		std::cout << "Window is root" << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
-void Dfwm::grabFocused(Window window) {
-	std::cout << "grabFocused" << std::endl;
+void Dfwm::grabFocused(Window window, int mode) {
+	std::cout << "grabFocused on window: " << window << std::endl;
+	if(windowIsNotDfwm(window) && window != 0) {
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
-	if(wndAttr.map_state == IsViewable && windowIsNotDfwm(window)) { // Huh? Too tired right now...
+
+	if(mode == NotifyNormal) std::cout << "NotifyNormal" << std::endl;
+	if(mode == NotifyGrab) std::cout << "NotifyGrab" << std::endl;
+	if(mode == NotifyUngrab) std::cout << "NotifyUngrab" << std::endl;
+
+	if(mode != NotifyUngrab && wndAttr.map_state == IsViewable) {
+		std::cout << "ENTERING IF STATEMENT!" << std::endl;
 		Atom type;
 		Atom* atoms;
 		unsigned long len, remain;
 		int form;
 
-		XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+		try {
+			std::cout << XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms) << std::endl;
 
-		for(int i = 0; i < (int)len; i++) { 
-			std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
-			if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
-				char* name;
-				if(XFetchName(disp, window, &name)) {
-					std::string s_name = name;
-					this->bar->setText(s_name);
-				} else this->bar->setText("Window X");
-				this->bar->redraw();
-				this->desktop[selected - 1]->setCurrentFocusedWindow(window);
-			} 
-		}
+			for(int i = 0; i < (int)len; i++) { 
+				std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
+				if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+					char* name;
+					if(XFetchName(disp, window, &name)) {
+						std::string s_name = name;
+						this->bar->setText(s_name);
+					} else this->bar->setText("Window X");
+					this->bar->redraw();
+					this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+				} 
+			}
+		} catch (char* e) {}
+	}
 	}
 	
 }
