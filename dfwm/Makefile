@@ -26,6 +26,9 @@ $(BDIR)/$(BNAME): $(OBJ)
 
 .PHONY: clean
 
+debug: CXXFLAGS += -DDEBUG
+debug: $(BDIR)/$(BNAME)
+
 clean:
 	@rm -R $(BDIR) $(SDIR)/*.o 2>/dev/null
 	@echo " << Clean: done >> "

@@ -1,4 +1,5 @@
 #include "../include/Dfwm.h"
+#include "../include/logger.h"
 
 Dfwm::Dfwm () {
 	disp = XOpenDisplay(NULL);
@@ -174,41 +175,51 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 }
 
 void Dfwm::run () {
-        /*XGrabKey(
-              disp,
-              XKeysymToKeycode(disp, XK_t),
-              Mod1Mask | 16 | 4,
-              root,
-              true,
-              GrabModeAsync,
-              GrabModeAsync);*/
 
         this->keys->setup(this);
 
 	while(running) {
 		XNextEvent (disp, &e);
-                std::cout << "GOT EVENT" << std::endl;
 
-		if (e.type == Expose)		drawGraphics(e.xexpose.window);
-		if (e.type == KeyPress) {
-                        keys->translate_KeyDown(this, &e.xkey);
-                        std::cout << "BUTTON PRESS" << std::endl;
-                }
-		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
-		if (e.type == ClientMessage) 	translateClientMessage(e.xclient);
-		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
-		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
-		//if (e.type == ButtonRelease) 	quit();
-		if (e.type == EnterNotify)  	grabFocused(e.xcrossing.window, e.xcrossing.mode);
-		if (e.type == FocusIn)  	grabFocused(e.xfocus.window, e.xfocus.mode);
-		if (e.type == MappingNotify)  	std::cout << "MappingNotify" << std::endl;
-		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
-		//if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
-		if (e.type == PropertyNotify) 	std::cout << "PropertyNotify" << std::endl;
-		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
-
-
-                XUngrabKey(disp,XKeysymToKeycode(disp, XK_F4),Mod1Mask,root);
+		switch(e.type) {
+			case Expose:
+				drawGraphics(e.xexpose.window);
+				break;
+			case KeyPress:
+				keys->translate_KeyDown(this, &e.xkey);
+				LOGGER_INFO("Button pressed");
+				break;
+			case KeyRelease:
+				keys->translate_KeyUp(this, &e.xkey);
+				break;
+			case ClientMessage:
+				translateClientMessage(e.xclient);
+				break;
+			case DestroyNotify:
+				removeWindowFromDesktop(e.xdestroywindow.window);
+				break;
+			case ConfigureRequest:
+				LOGGER_INFO("ConfigureRequest");
+				break;
+			case EnterNotify:
+				grabFocused(e.xcrossing.window, e.xcrossing.mode);
+				break;
+			case FocusIn:
+				grabFocused(e.xfocus.window, e.xfocus.mode);
+				break;
+			case MappingNotify:
+				LOGGER_INFO("MappingNotify");
+				break;
+			case MapRequest:
+				LOGGER_INFO("MapRequest");
+				break;
+			case PropertyNotify:
+				LOGGER_INFO("PropertyNotify");
+				break;
+			case UnmapNotify: 
+			  	LOGGER_INFO("UnmapNotify");
+				break;
+		}
 	}
 }
 
