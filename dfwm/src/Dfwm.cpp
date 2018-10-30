@@ -168,7 +168,7 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	std::cout << "MESSAGE TYPE: " << XGetAtomName(disp, xclient.message_type) << std::endl;
 	Atom NET_WM_STATE = XInternAtom(disp, "_NET_WM_STATE", True); 
 	if(xclient.message_type == NET_WM_STATE) {
-		std::cout << "It is a net wm state!" << std::endl;
+		//std::cout << "It is a net wm state!" << std::endl;
 		addWindowToDesktop(xclient.window);
 	}
 }
@@ -187,12 +187,12 @@ void Dfwm::run () {
 
 	while(running) {
 		XNextEvent (disp, &e);
-                std::cout << "GOT EVENT" << std::endl;
+                //std::cout << "GOT EVENT" << std::endl;
 
 		if (e.type == Expose)		drawGraphics(e.xexpose.window);
 		if (e.type == KeyPress) {
                         keys->translate_KeyDown(this, &e.xkey);
-                        std::cout << "BUTTON PRESS" << std::endl;
+                        //std::cout << "BUTTON PRESS" << std::endl;
                 }
 		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
 		if (e.type == ClientMessage) 	translateClientMessage(e.xclient);
@@ -296,19 +296,19 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 
 bool Dfwm::windowIsNotDfwm(Window window) {
 	if (window == this->bar->getWindowID()) {
-		std::cout << "Window is bar" << std::endl;
+		//std::cout << "Window is bar" << std::endl;
  		return false;
 	}
 	else if (window == this->menu->getWindowID()) {
-		std::cout << "Window is menu" << std::endl;
+		//std::cout << "Window is menu" << std::endl;
 		return false; 
 	}
 	else if (window == this->launcher->getWindowID()) { 
-		std::cout << "Window is launcher" << std::endl;
+		//std::cout << "Window is launcher" << std::endl;
 		return false;
 	}
 	else if (window == this->root) {
-		std::cout << "Window is root" << std::endl;
+		//std::cout << "Window is root" << std::endl;
 		return false;
 	}
 
@@ -326,7 +326,7 @@ void Dfwm::grabFocused(Window window, int mode) {
 	if(mode == NotifyUngrab) std::cout << "NotifyUngrab" << std::endl;
 
 	if(mode != NotifyUngrab && wndAttr.map_state == IsViewable) {
-		std::cout << "ENTERING IF STATEMENT!" << std::endl;
+		//std::cout << "ENTERING IF STATEMENT!" << std::endl;
 		Atom type;
 		Atom* atoms;
 		unsigned long len, remain;
