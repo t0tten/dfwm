@@ -77,7 +77,7 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
 
 	arr[size] = window;
 	size++;
-	XSelectInput(disp, window, EVENT_MASK);
+        XSelectInput(disp, window, EVENT_MASK);
 }
 
 void Desktop::addWindow(Window window) {

@@ -23,6 +23,15 @@ Dfwm::~Dfwm () {
 	delete[] desktop;
 }
 
+
+Display* Dfwm::getDisplay() {
+        return this->disp;
+}
+
+Window Dfwm::getRoot() {
+        return this->root;
+}
+
 Window* Dfwm::findAllWindows(unsigned int &nrOfWindows) {
 	Window tmp, tmp1;
 	Window* windows;
@@ -159,14 +168,29 @@ void Dfwm::removeMapped(Window window) {
 }
 
 void Dfwm::run () {
+        /*XGrabKey(
+              disp,
+              XKeysymToKeycode(disp, XK_t),
+              Mod1Mask | 16 | 4,
+              root,
+              true,
+              GrabModeAsync,
+              GrabModeAsync);*/
+
+        this->keys->setup(this);
+
 	while(running) {
 		XNextEvent (disp, &e);
+                std::cout << "GOT EVENT" << std::endl;
+
 		if (e.type == Expose)		drawGraphics(e.xexpose.window);
-		if (e.type == KeyPress) 	keys->translate_KeyDown(this, &e.xkey);
+		if (e.type == KeyPress) {
+                        keys->translate_KeyDown(this, &e.xkey);
+                        std::cout << "BUTTON PRESS" << std::endl;
+                }
 		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
 		if (e.type == ClientMessage) 	addWindowToDesktop(e.xclient.window);
 		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
-
 		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
 		//if (e.type == ButtonRelease) 	quit();
 		if (e.type == EnterNotify)  	std::cout << "EnterNotify" << std::endl;
@@ -176,6 +200,9 @@ void Dfwm::run () {
 		if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
 		if (e.type == PropertyNotify) 	std::cout << "PropertyNotify" << std::endl;
 		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
+
+
+                XUngrabKey(disp,XKeysymToKeycode(disp, XK_F4),Mod1Mask,root);
 	}
 }
 

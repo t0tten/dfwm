@@ -69,6 +69,9 @@ class Dfwm {
 		Window* getMappedList();
 		int getNrOfMapped();
 
+                Display* getDisplay();
+                Window getRoot();
+
 };
 
 #endif //_DFWM_
