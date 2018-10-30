@@ -9,6 +9,8 @@
 ### Desktop
 * Move windows between screens
 * Minimize functionality?
+* Swap main screen with focused on left side
+* Move windows to other array
 
 ### Launcher
 * Launcher should get focus when opened

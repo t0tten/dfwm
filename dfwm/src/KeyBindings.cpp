@@ -172,11 +172,11 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
                         std::string s;
                         s.push_back(text[0]);
 
-                        if(text[0] >= 0x20 && text[0] <= 0x7e) {
+			if(text[0] >= 0x20 && text[0] <= 0x7e) {
 				dfwm->getLauncher()->addChar(s);
 				dfwm->getLauncher()->draw();
 				dfwm->getLauncher()->redraw();
-                                }
+			}
 		}
 	}
 }
