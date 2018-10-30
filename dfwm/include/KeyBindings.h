@@ -16,6 +16,8 @@ class KeyBindings {
 
                 int getAction(XKeyEvent* keyCode);
                 void executeAction(Dfwm* dfwm, int action);
+                int unmask(int n);
+                void setupGrabKey(Dfwm* dfwm, unsigned int key, unsigned int modifier);
 	public:
 		KeyBindings (Display*);
 		~KeyBindings ();

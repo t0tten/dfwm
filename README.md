@@ -9,11 +9,12 @@
 ### Desktop
 * Move windows between screens
 * Minimize functionality?
-* Change focus when mouse is moved?
+* Swap main screen with focused on left side
+* Move windows to other array
 
 ### Launcher
-* Search through programs
-* Autocomplete
+* Launcher should get focus when opened
+* Launcher should close when it loose focus
 
 ### Statusbar
 * Clickable infos
@@ -23,26 +24,26 @@
 * A bit off - not really in the middle
 * Some sort of color indication that a desktop has windows
 
-### Keybindings
-* Keyboard not registered when NUMLOCK is off
-* Keyboard not registered when CAPLOCK is on
-
 ### Config
 * Read configurations from file
-
 
 ## Previous fixes:
 
 ### General
 
 ### Desktop
+* Change focus when mouse is moved?
 
 ### Launcher
+* Search through programs
+* Autocomplete
 
 ### Statusbar
 
 ### Menu
 
 ### Keybindings
+* Keyboard not registered when NUMLOCK is off
+* Keyboard not registered when CAPLOCK is on
 
 ### Config

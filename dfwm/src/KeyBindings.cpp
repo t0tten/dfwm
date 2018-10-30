@@ -1,4 +1,5 @@
 #include "../include/KeyBindings.h" 
+#include "../include/logger.h"
 #include "../Config.h"
 
 #define CTRL 4
@@ -22,39 +23,53 @@ void KeyBindings::changeDesktop(Dfwm* dfwm, int desktop) {
 	dfwm->getStatusBar()->redraw();
 }
 
+void KeyBindings::setupGrabKey(Dfwm* dfwm, unsigned int key, unsigned int modifier) {
+        XGrabKey(
+                dfwm->getDisplay(),
+                XKeysymToKeycode(dfwm->getDisplay(), key),
+                modifier,
+                dfwm->getRoot(),
+                true,
+                GrabModeAsync,
+                GrabModeAsync);
+}
+
 void KeyBindings::setup(Dfwm* dfwm) {
         for (int i=0; i < NUM_HOTKEYS; i++) {
-                /* Setup hotkey */
-                XGrabKey(
-                        dfwm->getDisplay(),
-                        XKeysymToKeycode(dfwm->getDisplay(), hotkeys[i].key),
-                        hotkeys[i].modifier,
-                        dfwm->getRoot(),
-                        true,
-                        GrabModeAsync,
-                        GrabModeAsync);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier);
 
-                /* Setup hotkey for when numlock is active */
-                XGrabKey(
-                        dfwm->getDisplay(),
-                        XKeysymToKeycode(dfwm->getDisplay(), hotkeys[i].key),
-                        hotkeys[i].modifier | NUM,
-                        dfwm->getRoot(),
-                        true,
-                        GrabModeAsync,
-                        GrabModeAsync);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | LockMask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod3Mask);
+
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | LockMask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | Mod3Mask);
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | LockMask | Mod3Mask);
+
+                this->setupGrabKey(dfwm, hotkeys[i].key, hotkeys[i].modifier 
+                                | Mod2Mask | Mod3Mask | LockMask);
         }
 }
 
-int KeyBindings::getAction(XKeyEvent* keyCode) {
-        unsigned int val = XLookupKeysym(keyCode, 0) << (keyCode->state);
+/* Unset the CapsLock, NumLock, SrollLock modifiers */
+int KeyBindings::unmask(int n) {
+        n &= ~(1UL << 1); // CapsLock
+        n &= ~(1UL << 4); // NumLock
+        n &= ~(1UL << 5); // ScrollLock
+        return n;
+}
 
-        std::cout << "val=" << val << std::endl;
-        std::cout << "hotkeys=" << NUM_HOTKEYS << std::endl;
+int KeyBindings::getAction(XKeyEvent* keyCode) {
+        unsigned int val = XLookupKeysym(keyCode, 0) << unmask(keyCode->state);
 
         for (int i=0; i < NUM_HOTKEYS; i++) {
-                if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val ||
-                     (hotkeys[i].key << (hotkeys[i].modifier | NUM)) == val) {
+                if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val) {
                         return hotkeys[i].action;
                 }
         }
@@ -113,25 +128,19 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                         dfwm->getLauncher()->show();
                         break;
                 case ACTION_KILL_ACTIVE:
-                        std::cout << "Killing window" << std::endl;
+                        LOGGER_INFO("Killing window");
 			dfwm->getCurrentDesktop()->killCurrentWindow();
                         break;
-                case ACTION_DMENU:
-                        dfwm->getCurrentDesktop()->openProgram(DMENU);
-                        break;
                 default:
-                        std::cout << "err: unknown action" << std::endl;
+                        LOGGER_INFO("err: unknown action");
                         break;
         }
 }
 
 void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
         int action = this->getAction(keyCode);
-        int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
 
-	std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
-	//dfwm->getStatusBar()->setText(keyTxt);
-	//dfwm->getStatusBar()->redraw();
+        int key = XLookupKeysym(keyCode, 0);
 
 	if(dfwm->getLauncher()->getState() == HIDING) {
                 this->executeAction(dfwm, action);
@@ -144,10 +153,28 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->removeLastChar();
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
-		} else {
-			dfwm->getLauncher()->addChar(XKeysymToString(key));
+		} else if(key == XK_Tab || key == XK_Down) {
+			dfwm->getLauncher()->autoCompleteInc();
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
+		} else if(key == XK_Up) {
+			dfwm->getLauncher()->autoCompleteDec();
+			dfwm->getLauncher()->draw();
+			dfwm->getLauncher()->redraw();
+		} else {
+                        char text[32] = {};
+                        XComposeStatus status;
+                        KeySym keysym = NoSymbol;
+
+                        keyCode->state &= ~ControlMask;
+
+                        XLookupString(keyCode, text, sizeof(text)-1, &keysym, &status);
+                        
+                        if(text[0] >= 0x20 && text[0] <= 0x7e) {
+				dfwm->getLauncher()->addChar(text[0]);
+				dfwm->getLauncher()->draw();
+				dfwm->getLauncher()->redraw();
+                       }
 		}
 	}
 }

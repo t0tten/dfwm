@@ -1,4 +1,5 @@
 #include "../include/Dfwm.h"
+#include "../include/logger.h"
 
 Dfwm::Dfwm () {
 	disp = XOpenDisplay(NULL);
@@ -11,7 +12,7 @@ Dfwm::Dfwm (std::string displayName) {
 }
 
 Dfwm::~Dfwm () {
-	std::cout << "Calls destructor" << std::endl;
+	LOGGER_DEBUG("Calls destructor");
 	for(int i = 0; i < maxDesktops; i++) {
 		delete desktop[i];
 	}
@@ -88,13 +89,10 @@ void Dfwm::init () {
 
 	unsigned int nrOfWindows;
 	Window* windows = findAllWindows(nrOfWindows);
-	std::cout << "NrOfWindows: " <<  nrOfWindows << std::endl;
+	LOGGER_DEBUGF("NrOfWindows: %d", nrOfWindows);
 	
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
-
-	XGrabKey(disp, code, AnyKey, root,
-        	True, GrabModeAsync, GrabModeAsync);
 
 	XSelectInput (disp, root, EVENT_MASK);
 
@@ -165,50 +163,62 @@ void Dfwm::removeMapped(Window window) {
 }
 
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
-	std::cout << "MESSAGE TYPE: " << XGetAtomName(disp, xclient.message_type) << std::endl;
+	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
 	Atom NET_WM_STATE = XInternAtom(disp, "_NET_WM_STATE", True); 
 	if(xclient.message_type == NET_WM_STATE) {
-		std::cout << "It is a net wm state!" << std::endl;
 		addWindowToDesktop(xclient.window);
 	}
 }
 
 void Dfwm::run () {
-        /*XGrabKey(
-              disp,
-              XKeysymToKeycode(disp, XK_t),
-              Mod1Mask | 16 | 4,
-              root,
-              true,
-              GrabModeAsync,
-              GrabModeAsync);*/
 
         this->keys->setup(this);
 
 	while(running) {
 		XNextEvent (disp, &e);
-                std::cout << "GOT EVENT" << std::endl;
-
-		if (e.type == Expose)		drawGraphics(e.xexpose.window);
-		if (e.type == KeyPress) {
-                        keys->translate_KeyDown(this, &e.xkey);
-                        std::cout << "BUTTON PRESS" << std::endl;
-                }
-		if (e.type == KeyRelease) 	keys->translate_KeyUp(this, &e.xkey);
-		if (e.type == ClientMessage) 	translateClientMessage(e.xclient);
-		if (e.type == DestroyNotify) 	removeWindowFromDesktop(e.xdestroywindow.window);
-		if (e.type == ConfigureRequest)	std::cout << "ConfigureRequest" << std::endl;
-		//if (e.type == ButtonRelease) 	quit();
-		if (e.type == EnterNotify)  	grabFocused(e.xcrossing.window, e.xcrossing.mode);
-		if (e.type == FocusIn)  	grabFocused(e.xfocus.window, e.xfocus.mode);
-		if (e.type == MappingNotify)  	std::cout << "MappingNotify" << std::endl;
-		if (e.type == MapRequest)  	std::cout << "MapRequest" << std::endl;
-		//if (e.type == MotionNotify)  	std::cout << "MotionNotify" << std::endl;
-		if (e.type == PropertyNotify) 	std::cout << "PropertyNotify" << std::endl;
-		if (e.type == UnmapNotify)  	std::cout << "UnmapNotify" << std::endl;
-
-
-                XUngrabKey(disp,XKeysymToKeycode(disp, XK_F4),Mod1Mask,root);
+		switch(e.type) {
+			case Expose:
+				drawGraphics(e.xexpose.window);
+				break;
+			case KeyPress:
+				keys->translate_KeyDown(this, &e.xkey);
+				LOGGER_INFO("Button pressed");
+				break;
+			case KeyRelease:
+				keys->translate_KeyUp(this, &e.xkey);
+				break;
+                        case KeymapNotify:
+                                LOGGER_INFO("KeymapNotify");
+                                XRefreshKeyboardMapping(&e.xmapping);
+                                break;
+			case ClientMessage:
+				translateClientMessage(e.xclient);
+				break;
+			case DestroyNotify:
+				removeWindowFromDesktop(e.xdestroywindow.window);
+				break;
+			case ConfigureRequest:
+				LOGGER_INFO("ConfigureRequest");
+				break;
+			case EnterNotify:
+				grabFocused(e.xcrossing.window, e.xcrossing.mode);
+				break;
+			case FocusIn:
+				grabFocused(e.xfocus.window, e.xfocus.mode);
+				break;
+			case MappingNotify:
+				LOGGER_INFO("MappingNotify");
+				break;
+			case MapRequest:
+				LOGGER_INFO("MapRequest");
+				break;
+			case PropertyNotify:
+				LOGGER_INFO("PropertyNotify");
+				break;
+			case UnmapNotify: 
+			  	LOGGER_INFO("UnmapNotify");
+				break;
+		}
 	}
 }
 
@@ -263,7 +273,7 @@ void Dfwm::drawGraphics(Window window) {
 }
 
 void Dfwm::addWindowToDesktop(Window window) {
-	std::cout << "addWindowToDesktop" << std::endl;
+	LOGGER_DEBUG("addWindowToDesktop");
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
 	if(wndAttr.map_state == IsViewable && !isMapped(window)) {
@@ -275,7 +285,7 @@ void Dfwm::addWindowToDesktop(Window window) {
 		XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
 		for(int i = 0; i < (int)len; i++) { 
-			std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
+			LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
 			if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
 
 				this->desktop[selected - 1]->addWindow(window);
@@ -296,19 +306,19 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 
 bool Dfwm::windowIsNotDfwm(Window window) {
 	if (window == this->bar->getWindowID()) {
-		std::cout << "Window is bar" << std::endl;
+		LOGGER_DEBUG("Window is bar");
  		return false;
 	}
 	else if (window == this->menu->getWindowID()) {
-		std::cout << "Window is menu" << std::endl;
+		LOGGER_DEBUG("Window is menu");
 		return false; 
 	}
 	else if (window == this->launcher->getWindowID()) { 
-		std::cout << "Window is launcher" << std::endl;
+		LOGGER_DEBUG("Window is launcher");
 		return false;
 	}
 	else if (window == this->root) {
-		std::cout << "Window is root" << std::endl;
+		LOGGER_DEBUG("Window is root");
 		return false;
 	}
 
@@ -316,27 +326,31 @@ bool Dfwm::windowIsNotDfwm(Window window) {
 }
 
 void Dfwm::grabFocused(Window window, int mode) {
-	std::cout << "grabFocused on window: " << window << std::endl;
+	LOGGER_DEBUGF("grabFocused on window: %lu", window);
 	if(windowIsNotDfwm(window) && window != 0) {
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
 
-	if(mode == NotifyNormal) std::cout << "NotifyNormal" << std::endl;
-	if(mode == NotifyGrab) std::cout << "NotifyGrab" << std::endl;
-	if(mode == NotifyUngrab) std::cout << "NotifyUngrab" << std::endl;
+	if(mode == NotifyNormal) {
+                LOGGER_DEBUG( "NotifyNormal");
+        } else if(mode == NotifyGrab) {
+                LOGGER_DEBUG( "NotifyGrab");
+        } else if(mode == NotifyUngrab) {
+                LOGGER_DEBUG( "NotifyUngrab");
+        }
 
 	if(mode != NotifyUngrab && wndAttr.map_state == IsViewable) {
-		std::cout << "ENTERING IF STATEMENT!" << std::endl;
+		LOGGER_DEBUG( "ENTERING IF STATEMENT!");;
 		Atom type;
 		Atom* atoms;
 		unsigned long len, remain;
 		int form;
 
 		try {
-			std::cout << XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms) << std::endl;
+			LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
 
 			for(int i = 0; i < (int)len; i++) { 
-				std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
+				LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
 				if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
 					char* name;
 					if(XFetchName(disp, window, &name)) {

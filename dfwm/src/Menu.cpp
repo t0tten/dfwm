@@ -1,4 +1,5 @@
 #include "../include/Menu.h"
+#include "../include/logger.h"
 
 Menu::Menu (Display* disp, Window* parent, int diameter, int* selected, int maxDesktops) {
 	this->disp	= disp;
@@ -13,7 +14,7 @@ Menu::Menu (Display* disp, Window* parent, int diameter, int* selected, int maxD
 	this->pWidth	= wndAttr.width;
 	this->pHeight	= wndAttr.height;
 	
-	std::cout << pWidth << ", " << pHeight << std::endl;
+        LOGGER_INFOF("%d, %d", pWidth, pHeight);
 
 	this->changeAlignment(MENU_POSITION);
 	this->menu	= XCreateSimpleWindow(disp, *parent, x - (dd / 2), y - (dd / 2), diameter + dd, diameter + dd, 0, 0, 0);

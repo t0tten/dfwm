@@ -4,6 +4,9 @@
 #include <X11/Xlib.h>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <dirent.h>
+#include <sstream>
 
 #include "./Constants.h"
 
@@ -19,14 +22,18 @@ class Launcher {
 		int color;
 		int textColor;
 
-		std::string* results;
 		std::string path;
 		
 		LauncherState state;
 
 		std::string searchPhrase;
+		std::vector<std::string> files;
+		std::vector<std::string> results;
+		int autoCorrectIndex;
 		
 		void search();
+		bool fetchFiles(std::string);
+		void getPaths();
 
 	public:
 		Launcher(Display*, Window*);
@@ -38,12 +45,14 @@ class Launcher {
 		void draw();
 		void redraw();
 	
-		void addChar(char*);
+		void addChar(char);
 		void removeLastChar();
 
 		Window getLauncherWindow();
 
 		std::string getText();
+		void autoCompleteInc();
+		void autoCompleteDec();
 
 		LauncherState getState();
 		void setState(LauncherState);
