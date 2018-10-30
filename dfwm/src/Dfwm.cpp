@@ -187,6 +187,10 @@ void Dfwm::run () {
 			case KeyRelease:
 				keys->translate_KeyUp(this, &e.xkey);
 				break;
+                        case KeymapNotify:
+                                LOGGER_INFO("KeymapNotify");
+                                XRefreshKeyboardMapping(&e.xmapping);
+                                break;
 			case ClientMessage:
 				translateClientMessage(e.xclient);
 				break;
