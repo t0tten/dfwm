@@ -50,9 +50,6 @@ void KeyBindings::setup(Dfwm* dfwm) {
 int KeyBindings::getAction(XKeyEvent* keyCode) {
         unsigned int val = XLookupKeysym(keyCode, 0) << (keyCode->state);
 
-        LOGGER_DEBUGF("val=%u", val); 
-        LOGGER_DEBUGF("hotkeys=%lu", NUM_HOTKEYS);
-
         for (int i=0; i < NUM_HOTKEYS; i++) {
                 if ( ((hotkeys[i].key << hotkeys[i].modifier)) == val ||
                      (hotkeys[i].key << (hotkeys[i].modifier | NUM)) == val) {

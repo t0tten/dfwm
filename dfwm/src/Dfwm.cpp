@@ -94,9 +94,6 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	XGrabKey(disp, code, AnyKey, root,
-        	True, GrabModeAsync, GrabModeAsync);
-
 	XSelectInput (disp, root, EVENT_MASK);
 
 	XMapWindow (disp, root);
