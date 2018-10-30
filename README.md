@@ -29,3 +29,20 @@
 
 ### Config
 * Read configurations from file
+
+
+## Previous fixes:
+
+### General
+
+### Desktop
+
+### Launcher
+
+### Statusbar
+
+### Menu
+
+### Keybindings
+
+### Config
