@@ -127,7 +127,7 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
         int action = this->getAction(keyCode);
         int key = XLookupKeysym(keyCode, 0) << (keyCode->state - 16);
 
-	std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
+	//std::string keyTxt = "KeyCode: " + std::to_string(keyCode->keycode) + ", State: " + std::to_string(keyCode->state);
 	//dfwm->getStatusBar()->setText(keyTxt);
 	//dfwm->getStatusBar()->redraw();
 
@@ -140,6 +140,10 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->hide();
 		} else if(key == XK_BackSpace) {
 			dfwm->getLauncher()->removeLastChar();
+			dfwm->getLauncher()->draw();
+			dfwm->getLauncher()->redraw();
+		} else if(key == XK_Tab) {
+			dfwm->getLauncher()->autoComplete();
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
 		} else {
