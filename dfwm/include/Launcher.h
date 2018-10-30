@@ -51,7 +51,8 @@ class Launcher {
 		Window getLauncherWindow();
 
 		std::string getText();
-		void autoComplete();
+		void autoCompleteInc();
+		void autoCompleteDec();
 
 		LauncherState getState();
 		void setState(LauncherState);

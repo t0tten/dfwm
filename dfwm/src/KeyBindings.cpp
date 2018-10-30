@@ -153,8 +153,12 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 			dfwm->getLauncher()->removeLastChar();
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
-		} else if(key == XK_Tab) {
-			dfwm->getLauncher()->autoComplete();
+		} else if(key == XK_Tab || key == XK_Down) {
+			dfwm->getLauncher()->autoCompleteInc();
+			dfwm->getLauncher()->draw();
+			dfwm->getLauncher()->redraw();
+		} else if(key == XK_Up) {
+			dfwm->getLauncher()->autoCompleteDec();
 			dfwm->getLauncher()->draw();
 			dfwm->getLauncher()->redraw();
 		} else {

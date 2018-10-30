@@ -112,11 +112,19 @@ bool Launcher::fetchFiles(std::string path) {
 	return false;
 }
 
-void Launcher::autoComplete() {
+void Launcher::autoCompleteInc() {
 	if(this->results.size() > 0) {
 		autoCorrectIndex++;
 		if(autoCorrectIndex >= results.size() || autoCorrectIndex >= 10) autoCorrectIndex = 0;
 		if(autoCorrectIndex >= 0) this->searchPhrase = this->results.at(autoCorrectIndex);
+	}
+}
+
+void Launcher::autoCompleteDec() {
+	if(this->results.size() > 0) {
+		autoCorrectIndex--;
+		if(autoCorrectIndex < 0) autoCorrectIndex = (results.size() >= 10) ? autoCorrectIndex = 9 : (results.size() - 1);
+		if(autoCorrectIndex < 10) this->searchPhrase = this->results.at(autoCorrectIndex);
 	}
 }
 
