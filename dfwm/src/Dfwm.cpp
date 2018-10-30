@@ -166,7 +166,6 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
 	Atom NET_WM_STATE = XInternAtom(disp, "_NET_WM_STATE", True); 
 	if(xclient.message_type == NET_WM_STATE) {
-		LOGGER_DEBUG("It is a net wm state!");
 		addWindowToDesktop(xclient.window);
 	}
 }
@@ -177,7 +176,6 @@ void Dfwm::run () {
 
 	while(running) {
 		XNextEvent (disp, &e);
-
 		switch(e.type) {
 			case Expose:
 				drawGraphics(e.xexpose.window);
