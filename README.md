@@ -9,11 +9,8 @@
 ### Desktop
 * Move windows between screens
 * Minimize functionality?
-* Change focus when mouse is moved?
 
 ### Launcher
-* Search through programs
-* Autocomplete
 
 ### Statusbar
 * Clickable infos
@@ -36,8 +33,11 @@
 ### General
 
 ### Desktop
+* Change focus when mouse is moved?
 
 ### Launcher
+* Search through programs
+* Autocomplete
 
 ### Statusbar
 
