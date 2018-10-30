@@ -162,28 +162,21 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
                         char text[32] = {};
                         XComposeStatus status;
                         KeySym keysym = NoSymbol;
+
+                        keyCode->state &= ~ControlMask;
+
                         XLookupString(keyCode, text, sizeof(text)-1, &keysym, &status);
 			std::string converted = XKeysymToString(keysym);
+                        LOGGER_DEBUGF("%s", text);
                         LOGGER_DEBUGF("converted %s", converted.c_str());
+                        std::string s;
+                        s.push_back(text[0]);
 
-			if(converted == "slash") converted = "/";
-			if(converted == "comma") converted = ",";
-			if(converted == "period") converted = ".";
-			if(converted == "backslash") converted = "\\";
-			if(converted == "bracketright") converted = "]";
-			if(converted == "bracketleft") converted = "[";
-			if(converted == "equal") converted = "=";
-			if(converted == "minus") converted = "-";
-			if(converted == "plus") converted = "+";
-			if(converted == "apostrophe") converted = "'";
-			if(converted == "semicolon") converted = ";";
-			if(converted == "grave") converted = "'";
-
-			if(converted.length() == 1) {
-				dfwm->getLauncher()->addChar(converted);
+                        if(text[0] >= 0x20 && text[0] <= 0x7e) {
+				dfwm->getLauncher()->addChar(s);
 				dfwm->getLauncher()->draw();
 				dfwm->getLauncher()->redraw();
-			}
+                                }
 		}
 	}
 }
