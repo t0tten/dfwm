@@ -132,9 +132,11 @@ void Launcher::search() {
 	/* Used to search in path after suggestions */
 	this->autoCorrectIndex = 0;
 	this->results.clear();
-	for(int i = 0; i < files.size(); i++) {
-		if (files.at(i).find(searchPhrase) != std::string::npos) {
+	if(searchPhrase.length() != 0) {
+		for(int i = 0; i < files.size(); i++) {
+			if (files.at(i).find(searchPhrase) != std::string::npos) {
 			this->results.push_back(files.at(i));
+			}
 		}
 	}
 }
