@@ -26,9 +26,10 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 	/* Infos */
 	this->nrOfInfos = 2;
 	this->infos 	= new StatusBarItemInfo*[nrOfInfos];
-	this->infos[0] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO);
+	this->infos[0] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, parentAttr);
 	this->infos[0]->setText("V: 100%");
-	this->infos[1] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, infos[0]->getX());
+	this->infos[1] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, parentAttr, 
+                        infos[0]->getX());
 	this->infos[1]->setText("B: 100%");
 
 	this->show();
