@@ -249,3 +249,7 @@ void Desktop::setCurrentFocusedWindow(Window window) {
 	wChange.border_width = BORDER_WIDTH;
 	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
 }
+
+bool Desktop::gotWindows() {
+	return ((amountLeft + amountRight) > 0) ? true : false;
+}

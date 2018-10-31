@@ -24,6 +24,7 @@ Dfwm::~Dfwm () {
 	delete this->bar;
 	delete this->menu;
 	delete this->launcher;
+	delete[] this->desktopHaveWindow;
 }
 
 
@@ -105,6 +106,7 @@ void Dfwm::init () {
 	this->menu 	= new Menu(disp, &root, 150, &selected, maxDesktops);
 	this->bar->redraw();
 	this->desktop	= new Desktop*[maxDesktops];
+	this->desktopHaveWindow = new bool[maxDesktops];
 	this->launcher	= new Launcher(disp, &root);	
 
 	for(int i = 0; i < maxDesktops; i++) {
@@ -285,8 +287,12 @@ int Dfwm::getNrOfMapped() 		{ return this->nrOfMapped; }
 
 void Dfwm::drawGraphics(Window window) {	
 	if(window == bar->getWindowID()) bar->draw();
-	else if(window == menu->getWindowID()) menu->draw();
-	else if(window == launcher->getLauncherWindow()) launcher->draw();
+	else if(window == menu->getWindowID()) {
+		for(int i = 0; i < maxDesktops; i++) {
+			 this->desktopHaveWindow[i] = this->desktop[i]->gotWindows();
+		} 
+		menu->draw(desktopHaveWindow);
+	} else if(window == launcher->getLauncherWindow()) launcher->draw();
 }
 
 void Dfwm::addWindowToDesktop(Window window) {

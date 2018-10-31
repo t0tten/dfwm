@@ -37,6 +37,7 @@ class Dfwm {
 		int maxDesktops;
 		KeyCode code;
 		bool running;
+		bool* desktopHaveWindow;
 		
 		void init();
 		Window* findAllWindows(unsigned int&);
