@@ -20,7 +20,6 @@
 * Clickable infos
 
 ### Menu
-* Some sort of color indication that a desktop has windows
 
 ### Config
 * Read configurations from file
@@ -41,6 +40,7 @@
 
 ### Menu
 * A bit off - not really in the middle
+* Color indication that a desktop has windows
 
 ### Keybindings
 * Keyboard not registered when NUMLOCK is off

@@ -6,6 +6,7 @@ Menu::Menu (Display* disp, Window* parent, int diameter, int* selected, int maxD
 	this->selected 	= selected;
 	this->diameter 	= diameter;
 	this->dd 	= 40;
+	this->indD	= 7;
 	this->nrOfDesktops = maxDesktops;
 
 	XWindowAttributes wndAttr;
@@ -51,12 +52,12 @@ void Menu::hide() {
 	XUnmapWindow(disp, menu);
 }
 
-void Menu::draw() {
+void Menu::draw(bool* desktopHaveWindow) {
 	XSetForeground(disp, gc, COL_MENU_BG);
 	XFillArc(disp, menu, gc, dd / 2, dd / 2, diameter, diameter, CIRCLE[0], CIRCLE[1]);
 
 	XSetForeground(disp, gc, COL_MENU_SETTINGS_FG);
-	XDrawString(disp, menu, gc, (diameter + dd) / 2 - (2 * 6.5), (diameter + dd) / 2, "DFWM", 4);
+	XDrawString(disp, menu, gc, (diameter + dd) / 2 - (2 * 5), (diameter + dd) / 2, "DFWM", 4);
 
 	/* Draw desktops */
 	int r = diameter / 2;
@@ -74,6 +75,13 @@ void Menu::draw() {
 		dColor = (*selected == (i + 1)) ? COL_SELECTED_FG : COL_MENU_DESKTOP_FG;
 		XSetForeground(disp, gc, dColor);
 		XDrawString(disp, menu, gc, tX + (dd/2) - 2, tY + (dd/2) + 5, std::to_string(i + 1).c_str(), std::to_string(i + 1).length());
+
+		/* Draw gotWindow indication */
+		if(desktopHaveWindow[i]) 	XSetForeground(disp, gc, COL_MENU_DESKTOP_IND_POP);
+		else 				XSetForeground(disp, gc, COL_MENU_DESKTOP_IND_EMPTY);
+		tX = ((r - (dd - indD)) * cos(angle)) + r + ((dd/2) - (indD/2));
+		tY = ((r - (dd - indD)) * sin(angle)) + r + ((dd/2) - (indD/2));
+		XFillArc(disp, menu, gc, tX, tY, indD, indD, CIRCLE[0], CIRCLE[1]);
 	}
 }
 

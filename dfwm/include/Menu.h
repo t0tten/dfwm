@@ -16,6 +16,7 @@ class Menu {
 
 		int x, y;
 		int diameter, dd;
+		int indD;
 
 		int pWidth, pHeight;
 		int nrOfDesktops;
@@ -26,7 +27,7 @@ class Menu {
 		~Menu();
 
 		void changeAlignment(int);
-		void draw();
+		void draw(bool*);
 		void redraw();
 
 		int getWindowID ();
