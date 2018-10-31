@@ -172,6 +172,14 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	}
 }
 
+void Dfwm::ungrabKeys() {
+        Window cwin = this->desktop[selected-1]->getCurrentFocusedWindow();
+        if(cwin != -1) {
+                XUngrabKey(this->disp, XLookupKeysym(&e.xkey, 0), e.xkey.state, 
+                        cwin);
+        }
+}
+
 void Dfwm::handleXEvent() {
         switch(e.type) {
                 case Expose:
@@ -180,9 +188,11 @@ void Dfwm::handleXEvent() {
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
                         LOGGER_INFO("Button pressed");
+                        this->ungrabKeys();
                         break;
                 case KeyRelease:
                         keys->translate_KeyUp(this, &e.xkey);
+                        this->ungrabKeys();
                         break;
                 case KeymapNotify:
                         LOGGER_INFO("KeymapNotify");
