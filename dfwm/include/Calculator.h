@@ -57,7 +57,7 @@ void Calculator::calcTree(Node* node) {
 		if(node->right != NULL)	calcTree(node->right);
 
 		if(node->op == 'h') {
-			throw "Not fully implemented yet";
+			throw ""; //Not fully implemented yet";
 		}
 		if(node->op != 'e') {
 			switch(node->op) {
@@ -97,18 +97,20 @@ void Calculator::addNode(Node*& tree, char op, std::string num) {
 	if(tree != NULL && tree->op == 'h' && tree->left != NULL) {
 		tree->op = op;
 	} else {
-		Node* child = new Node(0, op, tree);
-		child->left = new Node(std::stod(num), 'e', child);
-		if (tree == NULL) {
-			tree = child;
-			root = tree;
-		} else if (tree->left == NULL) {
-			tree->left = child;
-			tree = tree->left;
-		} else {
-			tree->right = child;
-			tree = tree->right;
-		}
+		if(num != "") {
+			Node* child = new Node(0, op, tree);
+			child->left = new Node(std::stod(num), 'e', child);
+			if (tree == NULL) {
+				tree = child;
+				root = tree;
+			} else if (tree->left == NULL) {
+				tree->left = child;
+				tree = tree->left;
+			} else {
+				tree->right = child;
+				tree = tree->right;
+			}
+		} else throw "";
 	}
 }
 
@@ -118,9 +120,6 @@ void Calculator::buildTree(std::string input) {
 	bool pow 		= false;
 	Node* tree 		= root;
 
-	// Node(int num, char op, Node* left = NULL, Node* right = NULL) {
-	//void Calculator::addNode(Node*& tree, char op, std::string num) {
-	
 	for(int i = 0; i < input.length(); i++) {
 		switch (input[i]) {
 			case '(':
@@ -145,7 +144,7 @@ void Calculator::buildTree(std::string input) {
 			case ')':
 				{
 					//std::cout << "find h" << std::endl;
-					if(tree->op == 'h') {
+					if(tree->left != NULL && tree->op == 'h') {
 						Node* tmp = tree->left;
 
 						tree->op = tree->left->op;
@@ -155,16 +154,13 @@ void Calculator::buildTree(std::string input) {
 						tmp->left = NULL;
 						tmp->right = NULL;
 						delete tmp;
-					} else {
-						//std::cout << "hae: " << number << std::endl;
+					} else if(number != "") {
 						tree->right = new Node(std::stod(number), 'e', tree);
-						//std::cout << "hae" << std::endl;
 					}
 
 					Node* walker = tree;				
 					while(walker->parent != NULL && walker->op != 'h') walker = walker->parent;
 					tree = walker;
-					//std::cout << "haei2" << std::endl;
 
 					number 		= "";
 					characters 	= "";
@@ -229,7 +225,7 @@ void Calculator::buildTree(std::string input) {
 
 	////std::cout << "treeOP: " << tree->op << std::endl;
 	if (root == NULL) throw "";
-	if (tree->op == 'h') throw "Something went wrong";
+	if (tree->op == 'h') throw ""; //Something went wrong
 	if(number == "") throw "";
 	tree->right = new Node(stod(number), 'e', tree);
 	////std::cout << "TreeRightNum: " << tree->right->num << std::endl;

@@ -142,7 +142,8 @@ void Launcher::search() {
 				this->results.push_back(files.at(i));
 			}
 			if(results.size() == 0) {
-   	                     results.push_back(Calculator::calculate(searchPhrase));
+				std::string result = Calculator::calculate(searchPhrase);
+				if(result != "") results.push_back(result);
 	                }
 
 		}
