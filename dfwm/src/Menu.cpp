@@ -17,7 +17,7 @@ Menu::Menu (Display* disp, Window* parent, int diameter, int* selected, int maxD
         LOGGER_INFOF("%d, %d", pWidth, pHeight);
 
 	this->changeAlignment(MENU_POSITION);
-	this->menu	= XCreateSimpleWindow(disp, *parent, x - (dd / 2), y - (dd / 2), diameter + dd, diameter + dd, 0, 0, 0);
+	this->menu	= XCreateSimpleWindow(disp, *parent, x, y - (dd / 2), diameter + dd, diameter + dd, 0, 0, 0);
 	this->gc	= XCreateGC(disp, menu, 0, NULL);
 
 	XSelectInput(disp, menu, ExposureMask);
