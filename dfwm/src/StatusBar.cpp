@@ -17,10 +17,10 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 	this->dtop	= new StatusBarItemDesktop(10, COL_STATUS_BAR_DESKTOP_FG);
 
 	/* Clock */
-	this->clk 	= new StatusBarClk(dtop->getWidth(), COL_STATUS_BAR_CLK);
+	this->clock 	= new StatusBarClock(dtop->getWidth(), COL_STATUS_BAR_CLOCK);
 
 	/* Title */
-	this->title	= new StatusBarItem(clk->getWidth(), COL_STATUS_BAR_TITLE);
+	this->title	= new StatusBarItem(clock->getWidth(), COL_STATUS_BAR_TITLE);
 	this->title->setText("Terminal");
 	
 	/* Infos */
@@ -36,7 +36,7 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 }
 
 StatusBar::~StatusBar () {
-	delete this->clk;
+	delete this->clock;
 	delete this->title;
 	for(int i = 0; i < nrOfInfos; i++) {
 		delete infos[i];
@@ -54,7 +54,7 @@ void StatusBar::draw() {
 	XFillRectangle(disp, bar, gc, x, y, width, height);
 
 	this->dtop->draw(disp, &bar, &gc, selected);
-	this->clk->draw(disp, &bar, &gc);
+	this->clock->draw(disp, &bar, &gc);
 	this->title->draw(disp, &bar, &gc);
 	for(int i = 0; i < nrOfInfos; i++) {
 		this->infos[i]->draw(disp, &bar, &gc);	

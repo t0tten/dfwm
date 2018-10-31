@@ -5,7 +5,7 @@
 #include <string>
 
 #include "./Constants.h"
-#include "./StatusBarClk.h"
+#include "./StatusBarClock.h"
 #include "./StatusBarItem.h"
 #include "./StatusBarItemInfo.h"
 #include "./StatusBarItemDesktop.h"
@@ -17,7 +17,7 @@ class StatusBar {
 		GC gc;
 
 		StatusBarItemDesktop* dtop;
-		StatusBarClk* clk;
+		StatusBarClock* clock;
 		StatusBarItem* title;
 		StatusBarItemInfo** infos;
 		int nrOfInfos;
