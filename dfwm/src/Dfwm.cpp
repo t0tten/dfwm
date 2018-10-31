@@ -253,10 +253,12 @@ void Dfwm::run () {
 void Dfwm::quit() { running = false; }
 
 void Dfwm::setSelected(int selected) { 
-	this->desktop[this->selected - 1]->hide();
-	this->selected = selected; 
-	if(this->selected > maxDesktops) this->selected = maxDesktops;
-	this->desktop[this->selected - 1]->show();
+	if(this->selected != selected) {
+		this->desktop[this->selected - 1]->hide();
+		this->selected = selected; 
+		if(this->selected > maxDesktops) this->selected = maxDesktops;
+		this->desktop[this->selected - 1]->show();
+	}
 }
 
 void Dfwm::incrementSelected() {
