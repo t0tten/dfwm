@@ -28,6 +28,8 @@ class StatusBar {
 		int color;
 		int* selected;
 
+                void update();
+
 	public:
 		StatusBar(Display*, Window*, int*);
 		~StatusBar ();

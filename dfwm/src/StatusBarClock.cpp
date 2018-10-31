@@ -23,3 +23,7 @@ std::string StatusBarClock::getTime() {
 
         return now;
 }
+
+void StatusBarClock::update() {
+	this->setText(getTime());
+}

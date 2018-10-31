@@ -170,55 +170,81 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	}
 }
 
+void Dfwm::handleXEvent() {
+        switch(e.type) {
+                case Expose:
+                        drawGraphics(e.xexpose.window);
+                        break;
+                case KeyPress:
+                        keys->translate_KeyDown(this, &e.xkey);
+                        LOGGER_INFO("Button pressed");
+                        break;
+                case KeyRelease:
+                        keys->translate_KeyUp(this, &e.xkey);
+                        break;
+                case KeymapNotify:
+                        LOGGER_INFO("KeymapNotify");
+                        XRefreshKeyboardMapping(&e.xmapping);
+                        break;
+                case ClientMessage:
+                        translateClientMessage(e.xclient);
+                        break;
+                case DestroyNotify:
+                        removeWindowFromDesktop(e.xdestroywindow.window);
+                        break;
+                case ConfigureRequest:
+                        LOGGER_INFO("ConfigureRequest");
+                        break;
+                case EnterNotify:
+                        grabFocused(e.xcrossing.window, e.xcrossing.mode);
+                        break;
+                case FocusIn:
+                        grabFocused(e.xfocus.window, e.xfocus.mode);
+                        break;
+                case MappingNotify:
+                        LOGGER_INFO("MappingNotify");
+                        break;
+                case MapRequest:
+                        LOGGER_INFO("MapRequest");
+                        break;
+                case PropertyNotify:
+                        LOGGER_INFO("PropertyNotify");
+                        break;
+                case UnmapNotify: 
+                        LOGGER_INFO("UnmapNotify");
+                        break;
+        }
+}
+
 void Dfwm::run () {
+
+        int x11_fd = ConnectionNumber(disp);
+        fd_set in_fds;
+
+        struct timeval tv;
+        unsigned int count = 0;
 
         this->keys->setup(this);
 
 	while(running) {
-		XNextEvent (disp, &e);
-		switch(e.type) {
-			case Expose:
-				drawGraphics(e.xexpose.window);
-				break;
-			case KeyPress:
-				keys->translate_KeyDown(this, &e.xkey);
-				LOGGER_INFO("Button pressed");
-				break;
-			case KeyRelease:
-				keys->translate_KeyUp(this, &e.xkey);
-				break;
-                        case KeymapNotify:
-                                LOGGER_INFO("KeymapNotify");
-                                XRefreshKeyboardMapping(&e.xmapping);
-                                break;
-			case ClientMessage:
-				translateClientMessage(e.xclient);
-				break;
-			case DestroyNotify:
-				removeWindowFromDesktop(e.xdestroywindow.window);
-				break;
-			case ConfigureRequest:
-				LOGGER_INFO("ConfigureRequest");
-				break;
-			case EnterNotify:
-				grabFocused(e.xcrossing.window, e.xcrossing.mode);
-				break;
-			case FocusIn:
-				grabFocused(e.xfocus.window, e.xfocus.mode);
-				break;
-			case MappingNotify:
-				LOGGER_INFO("MappingNotify");
-				break;
-			case MapRequest:
-				LOGGER_INFO("MapRequest");
-				break;
-			case PropertyNotify:
-				LOGGER_INFO("PropertyNotify");
-				break;
-			case UnmapNotify: 
-			  	LOGGER_INFO("UnmapNotify");
-				break;
-		}
+                FD_ZERO(&in_fds);
+                FD_SET(x11_fd, &in_fds);
+
+                tv.tv_usec = 50;
+                tv.tv_sec = 0;
+
+                select(x11_fd + 1, &in_fds, NULL, NULL, &tv);
+
+                while(XPending(disp)) {
+                        XNextEvent(disp, &e);
+                        this->handleXEvent();
+                }
+
+                if(count % 10 == 0) {
+                        this->bar->redraw();
+                }
+
+                count++;
 	}
 }
 

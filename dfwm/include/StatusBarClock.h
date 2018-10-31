@@ -9,6 +9,8 @@ class StatusBarClock : public StatusBarItem {
 	public:
 		StatusBarClock(int x, int color);
 		~StatusBarClock();
+
+                void update();
 };
 
 #endif //_STATUS_BAR_CLOCK_

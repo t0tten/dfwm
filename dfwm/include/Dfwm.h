@@ -46,6 +46,7 @@ class Dfwm {
 		void addWindowToDesktop(Window);
 		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
+                void handleXEvent();
 
 	public:
 		Dfwm();

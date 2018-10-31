@@ -64,6 +64,8 @@ void StatusBar::draw() {
 int StatusBar::getWindowID() { return bar; }
 
 void StatusBar::redraw() {
+        this->update();
+
 	XEvent exp;
 	exp.type 		= Expose;
 	exp.xexpose.window 	= bar;
@@ -72,3 +74,8 @@ void StatusBar::redraw() {
 
 int StatusBar::getHeight() { return this->height; }
 void StatusBar::setText(std::string text) { this->title->setText(text); }
+
+void StatusBar::update() {
+        this->clock->update();
+}
+
