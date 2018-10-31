@@ -18,7 +18,6 @@
 
 ### Statusbar
 * Clickable infos
-* Get current time/date
 
 ### Menu
 * A bit off - not really in the middle
@@ -39,6 +38,7 @@
 * Autocomplete
 
 ### Statusbar
+* Get current time/date
 
 ### Menu
 
