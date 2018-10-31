@@ -52,6 +52,8 @@ class Desktop {
 		void openProgram(std::string);
 		void setCurrentFocusedWindow(Window);
 		bool gotWindows();
+                
+                Window getCurrentFocusedWindow();
 };
 
 #endif //_DESKTOP_

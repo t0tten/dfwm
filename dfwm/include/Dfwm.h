@@ -47,6 +47,7 @@ class Dfwm {
 		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
                 void handleXEvent();
+                void ungrabKeys();
 
 	public:
 		Dfwm();

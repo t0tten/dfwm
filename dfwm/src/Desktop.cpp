@@ -253,3 +253,7 @@ void Desktop::setCurrentFocusedWindow(Window window) {
 bool Desktop::gotWindows() {
 	return ((amountLeft + amountRight) > 0) ? true : false;
 }
+
+Window Desktop::getCurrentFocusedWindow() {
+        return this->currFocus;
+}
