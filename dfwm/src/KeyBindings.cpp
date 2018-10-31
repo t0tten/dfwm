@@ -180,7 +180,7 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 }
 
 void KeyBindings::translate_KeyUp (Dfwm* dfwm, XKeyEvent* keyCode) {
-        if (this->getAction(keyCode)) {
+        if (this->getAction(keyCode) == ACTION_HIDE_MENU) {
                 dfwm->getMenu()->hide();
         }
 }

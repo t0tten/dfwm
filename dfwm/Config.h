@@ -19,6 +19,7 @@
 #define ACTION_LAUNCHER         0x0010
 #define ACTION_KILL_ACTIVE      0x0011
 #define ACTION_HIDE             0x0012
+#define ACTION_HIDE_MENU        0x0013
 
 #define DEFAULT_TERMINAL "/usr/bin/mate-terminal"
 
@@ -57,7 +58,8 @@ const hotkey hotkeys[] =
         {ACTION_LAUNCHER, MOD, XK_Return},
         {ACTION_KILL_ACTIVE, MOD, XK_q},
         {ACTION_HIDE, 0, XK_Escape},
-        {ACTION_QUIT_WM, MOD, XK_Escape}
+        {ACTION_QUIT_WM, MOD, XK_Escape},
+        {ACTION_HIDE_MENU, MOD, XK_Alt_L}
 };
 
 #endif
