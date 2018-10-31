@@ -40,7 +40,6 @@ class Dfwm {
 		
 		void init();
 		Window* findAllWindows(unsigned int&);
-		bool isMapped(Window);
 		bool windowIsNotDfwm(Window);
 		void drawGraphics(Window);
 		void addWindowToDesktop(Window);
