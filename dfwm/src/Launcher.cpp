@@ -30,6 +30,16 @@ void Launcher::show() {
 	XRaiseWindow(disp, launcher);
 	this->draw();
 	this->getPaths();
+
+	Window focWin;
+	int revert;
+	XGetInputFocus(disp, &focWin, &revert);
+	if(focWin == launcher) {
+		std::cout << "ITS THE SAME!" << std::endl;
+	}
+	XSync(this->disp, false);
+	XSetInputFocus(disp, launcher, RevertToPointerRoot, CurrentTime);
+	XSelectInput(disp, launcher, KeyPressMask);
 }
 
 void Launcher::hide() {

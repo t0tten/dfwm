@@ -198,7 +198,7 @@ void Dfwm::handleXEvent() {
                         LOGGER_INFO("ConfigureRequest");
                         break;
                 case EnterNotify:
-                        grabFocused(e.xcrossing.window, e.xcrossing.mode);
+			grabFocused(e.xcrossing.window, e.xcrossing.mode);
                         break;
                 case FocusIn:
                         grabFocused(e.xfocus.window, e.xfocus.mode);
@@ -215,6 +215,9 @@ void Dfwm::handleXEvent() {
                 case UnmapNotify: 
                         LOGGER_INFO("UnmapNotify");
                         break;
+		//case MotionNotify:
+			//std::cout << "MotionNotify" << std::endl;
+			//break;
         }
 }
 
@@ -242,7 +245,7 @@ void Dfwm::run () {
                         this->handleXEvent();
                 }
 
-                if(count % 10 == 0) {
+                if(count % 100 == 0) {
                         this->bar->redraw();
                 }
 
