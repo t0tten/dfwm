@@ -1,4 +1,5 @@
 #include "../include/Launcher.h"
+#include "../include/Calculator.h"
 
 Launcher::Launcher (Display* disp, Window* parent) {
 	this->disp 	= disp;
@@ -138,8 +139,12 @@ void Launcher::search() {
 	if(searchPhrase.length() != 0) {
 		for(int i = 0; i < files.size(); i++) {
 			if (files.at(i).find(searchPhrase) != std::string::npos) {
-			this->results.push_back(files.at(i));
+				this->results.push_back(files.at(i));
 			}
+			if(results.size() == 0) {
+   	                     results.push_back(Calculator::calculate(searchPhrase));
+	                }
+
 		}
 	}
 }
