@@ -18,13 +18,13 @@ Dfwm::~Dfwm () {
 	}
 
 	delete[] desktop;
-	XUngrabKey(disp, code, AnyKey, root);
-	XCloseDisplay(disp);
 	delete this->keys;
 	delete this->bar;
 	delete this->menu;
 	delete this->launcher;
 	delete[] this->desktopHaveWindow;
+	XUngrabKey(disp, code, AnyKey, root);
+	XCloseDisplay(disp);
 }
 
 
