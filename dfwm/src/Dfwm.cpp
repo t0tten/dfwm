@@ -257,15 +257,6 @@ Launcher* Dfwm::getLauncher() 		{ return this->launcher; }
 Window* Dfwm::getMappedList() 		{ return this->mapped; }
 int Dfwm::getNrOfMapped() 		{ return this->nrOfMapped; }
 
-bool Dfwm::isMapped(Window wnd) {
-	bool found = false;
-	for(int i = 0; i < nrOfMapped && !found; i++) {
-		if(mapped[i] == wnd) { found = true; break; }
-	}
-
-	return found;
-}
-
 void Dfwm::drawGraphics(Window window) {	
 	if(window == bar->getWindowID()) bar->draw();
 	else if(window == menu->getWindowID()) menu->draw();
@@ -276,32 +267,27 @@ void Dfwm::addWindowToDesktop(Window window) {
 	LOGGER_DEBUG("addWindowToDesktop");
 	XWindowAttributes wndAttr;
 	XGetWindowAttributes(disp, window, &wndAttr);
-	if(wndAttr.map_state == IsViewable && !isMapped(window)) {
-		Atom type;
-		Atom* atoms;
-		unsigned long len, remain;
-		int form;
+        
+        Atom type;
+        Atom* atoms;
+        unsigned long len, remain;
+        int form;
 
-		XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+        XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
-		for(int i = 0; i < (int)len; i++) { 
-			LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
-			if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+        for(int i = 0; i < (int)len; i++) { 
+                LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
+                if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
 
-				this->desktop[selected - 1]->addWindow(window);
-				addMapped(window);
-			} 
-		}
-
-
-	}
+                        this->desktop[selected - 1]->addWindow(window);
+                        addMapped(window);
+                } 
+        }
 }
 
 void Dfwm::removeWindowFromDesktop(Window window) {
-	if(isMapped(window)) {
-		removeMapped(window);
-		this->desktop[selected - 1]->removeWindow(window);
-	}
+        removeMapped(window);
+        this->desktop[selected - 1]->removeWindow(window);
 }
 
 bool Dfwm::windowIsNotDfwm(Window window) {
