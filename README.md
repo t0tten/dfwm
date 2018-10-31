@@ -20,7 +20,6 @@
 * Clickable infos
 
 ### Menu
-* A bit off - not really in the middle
 * Some sort of color indication that a desktop has windows
 
 ### Config
@@ -41,6 +40,7 @@
 * Get current time/date
 
 ### Menu
+* A bit off - not really in the middle
 
 ### Keybindings
 * Keyboard not registered when NUMLOCK is off
