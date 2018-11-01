@@ -97,7 +97,7 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	XSelectInput (disp, root, EVENT_MASK);
+	XSelectInput (disp, root, EVENT_MASK | SubstructureRedirectMask);
 
 	XMapWindow (disp, root);
 	this->selected 	= 1;
@@ -245,6 +245,7 @@ void Dfwm::handleXEvent() {
                         break;
                 case MapRequest:
                         LOGGER_INFO("MapRequest");
+			checkWindow(e.xmaprequest.window);
                         break;
                 case PropertyNotify:
                         LOGGER_INFO("PropertyNotify");
