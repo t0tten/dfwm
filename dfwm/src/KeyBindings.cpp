@@ -196,8 +196,9 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 	if(dfwm->getLauncher()->getState() == HIDING) {
                 this->executeAction(dfwm, action);
 	} else if(dfwm->getLauncher()->getState() == SHOWING) {
-		if(key == XK_Escape)		dfwm->getLauncher()->hide();
-		else if(key == XK_Return) {
+		if(key == XK_Escape) {
+                        dfwm->getLauncher()->hide();
+                } else if(key == XK_Return) {
 			dfwm->getCurrentDesktop()->openProgram(dfwm->getLauncher()->getText());
 			dfwm->getLauncher()->hide();
 		} else if(key == XK_BackSpace) {

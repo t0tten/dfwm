@@ -81,7 +81,6 @@ const hotkey hotkeys[] =
         {ACTION_SWAP_FIRST_WNDS, MOD, XK_s},
         {ACTION_LAUNCHER, MOD, XK_Return},
         {ACTION_KILL_ACTIVE, MOD, XK_q},
-        {ACTION_HIDE, 0, XK_Escape},
         {ACTION_QUIT_WM, MOD, XK_Escape},
         {ACTION_HIDE_MENU, MOD, XK_Alt_L},
 	{ACTION_WV_WND_DESKTOP_1, CTRL | MOD, XK_1},
