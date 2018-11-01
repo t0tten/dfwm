@@ -25,26 +25,11 @@ Desktop::Desktop (Display* disp, Window* parent, int x, int y, int width, int he
 
 Desktop::~Desktop () {
 	LOGGER_DEBUG("Desktop::~Desktop");
-		/*Atom DELETE 	= XInternAtom(disp, "WM_DELETE_WINDOW", False);
-		Atom PROTO 	= XInternAtom(disp, "WM_PROTOCOLS", True);	
-	
-		XEvent eKill;
-		eKill.xclient.type = ClientMessage;
-		eKill.xclient.message_type = XInternAtom(disp, "WM_PROTOCOLS", true);
-		eKill.xclient.format = 32;
-		eKill.xclient.data.l[0] = XInternAtom(disp, "WM_DELETE_WINDOW", false);
-		eKill.xclient.data.l[1] = CurrentTime;
-		*/
-
 	for(int i = 0; i < amountLeft; i++) {
 		XDestroyWindow(disp, left[i]);
-		//eKill.xclient.window = left[i];
-		//XSendEvent(disp, left[i], False, NoEventMask, &eKill);
 	}
 	for(int i = 0; i < amountRight; i++) {
 		XDestroyWindow(disp, right[i]);
-		//eKill.xclient.window = left[i];
-		//XSendEvent(disp, left[i], False, NoEventMask, &eKill);
 	}
 
 	delete[] left;
@@ -65,32 +50,109 @@ void Desktop::hide() {
 
 void Desktop::redraw() {}
 
+void Desktop::moveFirstWndToLeft() {
+	if(amountRight > 0) {
+		addWindow(right[0], left, amountLeft);
+		for(int i = 0; i < (amountRight - 1); i++) {
+			right[i] = right[i+1];
+		}	
+		amountRight--;
+		resizeWindows();
+	}
+}
+
+void Desktop::moveLastWndToRight() {
+	if(amountLeft > 1) {
+		amountRight++;
+		for(int i = amountRight - 1; i >= 0; i--) {
+			right[i] = right[i-1];
+		}
+		right[0] = left[amountLeft-1];
+		amountLeft--;
+		resizeWindows();
+	}
+}
+
+void Desktop::moveCurrWndToLeft() {
+	moveToLeft(currFocus);
+}
+
+void Desktop::moveCurrWndToRight() {
+	moveToRight(currFocus);
+}
+
+void Desktop::moveCurrWndUpByOne() {
+	int index = findWindow(currFocus, left, amountLeft);
+	/* Window found on left side */
+	if(index != -1 && index != 0) {
+		Window tmp 	= left[index];
+		left[index] 	= left[index-1];
+		left[index-1] 	= tmp;
+	} else {
+		index = findWindow(currFocus, right, amountRight);
+		/* Window found on right side */
+		if(index != -1 && index != 0) {
+			Window tmp 	= right[index];
+			right[index] 	= right[index-1];
+			right[index-1] 	= tmp;
+			}
+	}
+
+	if(index != -1) resizeWindows();
+}
+
+void Desktop::moveCurrWndDownByOne() {
+	int index = findWindow(currFocus, left, amountLeft);
+	/* Window found on left side */
+	if(index != -1 && index != (amountLeft - 1)) {
+		Window tmp 	= left[index];
+		left[index] 	= left[index+1];
+		left[index+1] 	= tmp;
+	} else {
+		index = findWindow(currFocus, right, amountRight);
+		/* Window found on right side */
+		if(index != -1 && index != (amountRight - 1)) {
+			Window tmp 	= right[index];
+			right[index] 	= right[index+1];
+			right[index+1] 	= tmp;
+		}
+	}
+
+	if(index != -1) resizeWindows();
+}
+
 void Desktop::moveToLeft(Window window) {
 	LOGGER_DEBUG("void Desktop::moveToLeft(Window window)");
-	int index = findWindow(window, right, amountRight);
+	if(amountRight > 0) {
+		int index = findWindow(window, right, amountRight);
 
-	/* If the window is found */
-	if(index != -1) {
-		addWindow(window, left, amountLeft);
-		if(amountRight > 1) {
+		/* If the window is found */
+		if(index != -1) {
+			addWindow(window, left, amountLeft);
+			//if(amountRight > 1) {
 			for(int i = index; i < (amountRight - 1); i++) right[i] = right[i + 1];
+			//}
+			amountRight--;
 		}
-		amountRight--;
+		resizeWindows();
 	}
 }
 
 void Desktop::moveToRight(Window window) {
 	LOGGER_DEBUG("void Desktop::moveToRight(Window window)");
-	int index = findWindow(window, left, amountLeft);
-	/* If the window is found */
-	if(index != -1) {
-		addWindow(left[index], right, amountRight);
-		if(amountLeft > 1) {
-			for(int i = index; i < (amountLeft - 1); i++) {
-				left[i] = left[i + 1];
-			}
+	if(amountLeft > 1) {
+		int index = findWindow(window, left, amountLeft);
+		/* If the window is found */
+		if(index != -1) {
+			addWindow(left[index], right, amountRight);
+			//if(amountLeft > 1) {
+				for(int i = index; i < (amountLeft - 1); i++) {
+					left[i] = left[i + 1];
+				}
+			//}
+			amountLeft--;
 		}
-		amountLeft--;
+		resizeWindows();
 	}
 }
 

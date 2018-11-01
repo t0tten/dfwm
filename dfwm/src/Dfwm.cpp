@@ -77,6 +77,7 @@ void Dfwm::init () {
 	this->root	= RootWindow(disp, screen);	
 	this->maxDesktops = 5;
 	if(maxDesktops > 9) maxDesktops = 9;
+	if(maxDesktops <= 0) maxDesktops = 1;
 
 	/* Change property of root */
 	XSetWindowAttributes rootNewAttr;

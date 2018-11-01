@@ -121,6 +121,24 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                 case ACTION_PREV_DESKTOP:
                         changeDesktop(dfwm, false);
                         break;
+                case ACTION_MOVE_WND_LEFT:
+			dfwm->getCurrentDesktop()->moveFirstWndToLeft();
+                        break;
+                case ACTION_MOVE_WND_RGHT:
+			dfwm->getCurrentDesktop()->moveLastWndToRight();
+                        break;
+                case ACTION_MOVE_CUR_WND_LEFT:
+			dfwm->getCurrentDesktop()->moveCurrWndToLeft();
+                        break;
+                case ACTION_MOVE_CUR_WND_RGHT:
+			dfwm->getCurrentDesktop()->moveCurrWndToRight();
+                        break;
+                case ACTION_MOVE_CUR_WND_UP:
+			dfwm->getCurrentDesktop()->moveCurrWndUpByOne();
+                        break;
+                case ACTION_MOVE_CUR_WND_DOWN:
+			dfwm->getCurrentDesktop()->moveCurrWndDownByOne();
+                        break;
                 case ACTION_QUIT_WM:
                         dfwm->quit();
                         break;

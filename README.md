@@ -10,7 +10,6 @@
 * Move windows between screens
 * Minimize functionality?
 * Swap main screen with focused on left side
-* Move windows to other array
 
 ### Launcher
 * Launcher should get focus when opened
@@ -29,7 +28,12 @@
 ### General
 
 ### Desktop
-* Change focus when mouse is moved?
+* Change focus when mouse is moved
+* Move first window on right to last on left side
+* Move last on left side to first on right side
+* Move current focused window to other side
+* Move current focused window up by one
+* Move current focused window down by one
 
 ### Launcher
 * Search through programs

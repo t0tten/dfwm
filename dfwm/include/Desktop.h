@@ -45,6 +45,13 @@ class Desktop {
 
 		void moveToLeft(Window);
 		void moveToRight(Window);
+		
+		void moveFirstWndToLeft();
+		void moveLastWndToRight();
+		void moveCurrWndToLeft();
+		void moveCurrWndToRight();
+		void moveCurrWndUpByOne();
+		void moveCurrWndDownByOne();
 
 		void addWindow(Window);
 		void killCurrentWindow();
