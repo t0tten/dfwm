@@ -142,6 +142,36 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                 case ACTION_SWAP_FIRST_WNDS:
 			dfwm->getCurrentDesktop()->swapFirstWindows();
                         break;
+                case ACTION_WV_WND_DESKTOP_1:
+			dfwm->moveCurrentWindowToDesktop(1);
+			break;
+                case ACTION_MV_WND_DESKTOP_2:
+			dfwm->moveCurrentWindowToDesktop(2);
+			break;
+                case ACTION_MV_WND_DESKTOP_3:
+			dfwm->moveCurrentWindowToDesktop(3);
+			break;
+                case ACTION_MV_WND_DESKTOP_4:
+			dfwm->moveCurrentWindowToDesktop(4);
+			break;
+                case ACTION_MV_WND_DESKTOP_5:
+			dfwm->moveCurrentWindowToDesktop(5);
+			break;
+                case ACTION_MV_WND_DESKTOP_6:
+			dfwm->moveCurrentWindowToDesktop(6);
+			break;
+                case ACTION_MV_WND_DESKTOP_7:
+			dfwm->moveCurrentWindowToDesktop(7);
+			break;
+                case ACTION_MV_WND_DESKTOP_8:
+			dfwm->moveCurrentWindowToDesktop(8);
+			break;
+                case ACTION_MV_WND_DESKTOP_9:
+			dfwm->moveCurrentWindowToDesktop(9);
+			break;
+                case ACTION_MV_WND_DESKTOP_0:
+			dfwm->moveCurrentWindowToDesktop(0);
+			break;
                 case ACTION_QUIT_WM:
                         dfwm->quit();
                         break;

@@ -71,6 +71,7 @@ class Dfwm {
 		Window* getMappedList();
 		int getNrOfMapped();
 		void grabFocused(Window, int);
+		void moveCurrentWindowToDesktop(int);
 
                 Display* getDisplay();
                 Window getRoot();

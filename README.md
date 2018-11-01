@@ -7,7 +7,6 @@
 * Get FONT metrics
 
 ### Desktop
-* Move windows between screens
 * Minimize functionality?
 
 
@@ -34,6 +33,7 @@
 * Move current focused window up by one (alt+u)
 * Move current focused window down by one (alt+n)
 * Swap first window on left with first window on right (alt+s)
+* Move windows between screens
 
 ### Launcher
 * Search through programs

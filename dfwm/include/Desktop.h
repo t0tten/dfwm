@@ -60,6 +60,7 @@ class Desktop {
 		void openProgram(std::string);
 		void setCurrentFocusedWindow(Window);
 		bool gotWindows();
+		Window popCurrentWindow();
                 
                 Window getCurrentFocusedWindow();
 };

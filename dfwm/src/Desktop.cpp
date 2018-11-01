@@ -331,3 +331,9 @@ bool Desktop::gotWindows() {
 Window Desktop::getCurrentFocusedWindow() {
         return this->currFocus;
 }
+
+Window Desktop::popCurrentWindow() {
+	Window wnd = currFocus;
+	removeWindow(wnd);
+	return wnd;
+}
