@@ -182,11 +182,13 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
 
 void Desktop::addWindow(Window window) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window)");
-	if(amountLeft <= 0) {
-	 	addWindow(window, left, amountLeft);
-		setCurrentFocusedWindow(window);
-	}else  			addWindow(window, right, amountRight);
-	resizeWindows();
+	if(findWindow(window, left, amountLeft) == -1 && findWindow(window, right, amountRight) == -1) {
+		if(amountLeft <= 0 && findWindow(window, left, amountLeft) == -1) {
+	 		addWindow(window, left, amountLeft);
+			setCurrentFocusedWindow(window);
+		} else	addWindow(window, right, amountRight);
+		resizeWindows();
+	}
 }
 
 int Desktop::findWindow(Window window, Window* arr, int size) {
