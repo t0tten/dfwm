@@ -83,6 +83,7 @@ void Dfwm::init () {
 	XSetWindowAttributes rootNewAttr;
 	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
 	XChangeWindowAttributes(disp, root, CWEventMask|CWCursor, &rootNewAttr);
+	XSelectInput(disp, root, rootNewAttr.event_mask);
 	
 	/* Find all open windows */
 	this->size 	= 20;
@@ -219,6 +220,7 @@ void Dfwm::handleXEvent() {
                         break;
                 case MapRequest:
                         LOGGER_INFO("MapRequest");
+			grabFocused(e.xfocus.window);
                         break;
                 case PropertyNotify:
                         LOGGER_INFO("PropertyNotify");
@@ -374,6 +376,40 @@ void Dfwm::grabFocused(Window window, int mode) {
         	}
 	
 		if(mode != NotifyUngrab && wndAttr.map_state == IsViewable) {
+			LOGGER_DEBUG( "ENTERING IF STATEMENT!");;
+			Atom type;
+			Atom* atoms;
+			unsigned long len, remain;
+			int form;
+
+			try {
+				LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
+
+				for(int i = 0; i < (int)len; i++) { 
+					LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
+					if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+						char* name;
+						if(XFetchName(disp, window, &name)) {
+							std::string s_name = name;
+							this->bar->setText(s_name);
+						} else this->bar->setText("Window X");
+						this->bar->redraw();
+						this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+					} 
+				}
+			} catch (char* e) {}
+		}
+	}
+	
+}
+
+void Dfwm::grabFocused(Window window) {
+	LOGGER_DEBUGF("grabFocused on window: %lu", window);
+	if(windowIsNotDfwm(window) && window != 0) {
+		XWindowAttributes wndAttr;
+		XGetWindowAttributes(disp, window, &wndAttr);
+
+		if(wndAttr.map_state == IsViewable) {
 			LOGGER_DEBUG( "ENTERING IF STATEMENT!");;
 			Atom type;
 			Atom* atoms;
