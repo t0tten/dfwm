@@ -175,11 +175,14 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 }
 
 void Dfwm::checkWindow(Window window) {
-	std::cout << "CheckWindow" << std::endl;
+	std::cout << "CheckWindow: " << window << std::endl;
 	if(windowIsNotDfwm(window) && window != 0) {
+		std::cout << "Steg2" << std::endl;
 		XWindowAttributes wndAttr;
 		if(XGetWindowAttributes(disp, window, &wndAttr)) {
-			if(wndAttr.map_state == IsViewable) {
+			std::cout << "Steg3" << std::endl;
+
+			if(!wndAttr.override_redirect) {
 				std::cout << "ITS VIEWABLE" << std::endl;
 
 				Atom type;
@@ -241,10 +244,11 @@ void Dfwm::handleXEvent() {
                 case MapNotify:
                         LOGGER_INFO("MapNotify");
 			std::cout << "MapNotify" << std::endl;
-			checkWindow(e.xmap.window);
+			//checkWindow(e.xmap.window);
                         break;
                 case MapRequest:
                         LOGGER_INFO("MapRequest");
+			std::cout << "MapRequest" << std::endl;
 			checkWindow(e.xmaprequest.window);
                         break;
                 case PropertyNotify:
@@ -368,18 +372,22 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 bool Dfwm::windowIsNotDfwm(Window window) {
 	if (window == this->bar->getWindowID()) {
 		LOGGER_DEBUG("Window is bar");
+		std::cout << "Window is bar" << std::endl;
  		return false;
 	}
 	else if (window == this->menu->getWindowID()) {
 		LOGGER_DEBUG("Window is menu");
+		std::cout << "Window is menu" << std::endl;
 		return false; 
 	}
 	else if (window == this->launcher->getWindowID()) { 
 		LOGGER_DEBUG("Window is launcher");
+		std::cout << "Window is launcher" << std::endl;
 		return false;
 	}
 	else if (window == this->root) {
 		LOGGER_DEBUG("Window is root");
+		std::cout << "Window is root" << std::endl;
 		return false;
 	}
 
