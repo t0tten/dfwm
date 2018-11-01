@@ -49,6 +49,8 @@ void Launcher::hide() {
 	this->autoCorrectIndex = -1;
 	this->setState(HIDING);
 	XUnmapWindow(disp, launcher);
+
+	XSelectInput(disp, launcher, 0);
 }
 
 void Launcher::draw() {
