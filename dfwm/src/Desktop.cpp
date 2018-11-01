@@ -156,6 +156,16 @@ void Desktop::moveToRight(Window window) {
 	}
 }
 
+void Desktop::swapFirstWindows() {
+	if(amountLeft > 0 && amountRight > 0) {
+		Window tmp 	= left[0];
+		left[0] 	= right[0];
+		right[0] 	= tmp;
+	}
+	
+	resizeWindows();
+}
+
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window, Window*& arr, int& size)");
 	expandArray(arr, size);

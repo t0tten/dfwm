@@ -26,6 +26,7 @@
 #define ACTION_MOVE_CUR_WND_RGHT	0x0017
 #define ACTION_MOVE_CUR_WND_UP		0x0018
 #define ACTION_MOVE_CUR_WND_DOWN	0x0019
+#define ACTION_SWAP_FIRST_WNDS		0x001a
 
 #define DEFAULT_TERMINAL "/usr/bin/mate-terminal"
 
@@ -67,6 +68,7 @@ const hotkey hotkeys[] =
         {ACTION_MOVE_CUR_WND_RGHT, MOD, XK_l},
         {ACTION_MOVE_CUR_WND_UP, MOD, XK_u},
         {ACTION_MOVE_CUR_WND_DOWN, MOD, XK_n},
+        {ACTION_SWAP_FIRST_WNDS, MOD, XK_s},
         {ACTION_LAUNCHER, MOD, XK_Return},
         {ACTION_KILL_ACTIVE, MOD, XK_q},
         {ACTION_HIDE, 0, XK_Escape},

@@ -139,6 +139,9 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                 case ACTION_MOVE_CUR_WND_DOWN:
 			dfwm->getCurrentDesktop()->moveCurrWndDownByOne();
                         break;
+                case ACTION_SWAP_FIRST_WNDS:
+			dfwm->getCurrentDesktop()->swapFirstWindows();
+                        break;
                 case ACTION_QUIT_WM:
                         dfwm->quit();
                         break;

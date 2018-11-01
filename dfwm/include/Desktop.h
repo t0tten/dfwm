@@ -52,6 +52,7 @@ class Desktop {
 		void moveCurrWndToRight();
 		void moveCurrWndUpByOne();
 		void moveCurrWndDownByOne();
+		void swapFirstWindows();
 
 		void addWindow(Window);
 		void killCurrentWindow();
