@@ -12,7 +12,6 @@
 * Swap main screen with focused on left side
 
 ### Launcher
-* Launcher should get focus when opened
 * Launcher should close when it loose focus
 
 ### Statusbar
@@ -38,6 +37,7 @@
 ### Launcher
 * Search through programs
 * Autocomplete
+* Launcher should get focus when opened
 
 ### Statusbar
 * Get current time/date
