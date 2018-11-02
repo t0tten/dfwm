@@ -8,6 +8,7 @@
 #include "./Menu.h"
 #include "./Desktop.h"
 #include "./Launcher.h"
+#include "./Configuration.h"
 
 #include <iostream>
 #include <string>
@@ -26,6 +27,7 @@ class Dfwm {
 		Menu* menu;
 		Desktop** desktop;
 		Launcher* launcher;
+                Configuration* configuration;
 		
 		int size;
 		int nrOfMapped;

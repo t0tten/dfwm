@@ -36,14 +36,18 @@ class DfwmWindow {
                 Display *display;
                 //std::string name;
                 Window window;
+                Window root;
                 XWindowAttributes xWindowAttributes;
                 XWindowChanges xWindowChanges;
+
+
+                void setClientState(long state);
 
         public:
                 DfwmWindow();
                 ~DfwmWindow();
 
-                DfwmStatus init(Configuration*, Display*, Window);
+                DfwmStatus init(Configuration*, Display*, Window, Window);
 
                 Window getWindow();
 
@@ -60,6 +64,7 @@ class DfwmWindow {
 
                 DfwmStatus getWindowAttributes();
                 DfwmStatus resize(int x, int y, int width, int height);
+                DfwmStatus sendConfigureEvent();
 };
 
 #endif

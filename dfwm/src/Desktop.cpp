@@ -168,40 +168,10 @@ void Desktop::swapFirstWindows() {
 
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window, Window*& arr, int& size)");
-	std::cout << "addWindow(asdasd)" << std::endl;
-	XWindowChanges wChange;
-	wChange.border_width = BORDER_WIDTH;
-	if(XConfigureWindow(disp, window, CWBorderWidth, &wChange) && XSetWindowBorder(disp, window, COL_BORDER)) {
-		expandArray(arr, size);
-		arr[size] = window;
-		size++;
-        	//XSelectInput(disp, window, EVENT_MASK);
-        	XSelectInput(disp, window, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 
-		//-----
-		/*XConfigureEvent ce;
-
-        	ce.type = ConfigureNotify;
-        	ce.display = disp;
-        	ce.event = window;
-        	ce.window = window;
-        	ce.x = 0;
-        	ce.y = 0;
-        	ce.width = 200;
-        	ce.height = 200;
-        	ce.border_width = 1;
-        	ce.above = None;
-        	ce.override_redirect = False;
-        	XSendEvent(disp, window, False, StructureNotifyMask, (XEvent *)&ce);*/
-		//-----
-		XChangeProperty(disp, *root, XInternAtom(disp, "_NET_CLIENT_LIST", False), XA_WINDOW, 32, PropModeAppend, (unsigned char *)&window, 1);	
-
-		XMapWindow(disp, window);
-		XMapSubwindows(disp, window);
-		//XClearArea(disp, window, 0,0, 500, 500, True);
-		std::cout << "efter change prop" << std::endl;
-		//XFlush(disp);
-	}
+        expandArray(arr, size);
+        arr[size] = window;
+        size++;
 }
 
 void Desktop::addWindow(Window window) {
@@ -294,12 +264,9 @@ void Desktop::expandArray(Window*& arr, int amount) {
 }
 
 void Desktop::resizeWindows() {
-	LOGGER_DEBUG("void Desktop::resizeWindows()");
-        LOGGER_DEBUGF("amountLeft: %d amountRight: %d", amountRight, amountLeft);
 
 	/* Resize windows on the left side */
 	if(amountLeft > 0) {
-		LOGGER_DEBUG("Enter resize left");
 		int wX		= x + wgap;
 		int wY		= y + wgap;
 		int wWidth 	= (amountRight == 0) ? width - (2 * wgap) : (width / 2) - (2 * wgap); 
@@ -329,7 +296,6 @@ void Desktop::resizeWindows() {
 
 	/* Resize windows on the right side */
 	if(amountRight > 0) {
-		LOGGER_DEBUG("Enter resize right");
 		int wX		= (width / 2);
 		int wY		= y + wgap;
 		int wWidth 	= (width / 2) - wgap; 

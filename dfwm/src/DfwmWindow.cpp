@@ -22,6 +22,9 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+
 #include "../include/DfwmWindow.h"
 #include "../include/logger.h"
 #include "../include/status_codes.h"
@@ -34,7 +37,7 @@ DfwmWindow::~DfwmWindow() {
 }
 
 DfwmStatus DfwmWindow::init(Configuration* configuration, 
-                Display* display, Window window) {
+                Display* display, Window window, Window root) {
         int ret;
 
         if(configuration == NULL || display == NULL) {
@@ -44,34 +47,75 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
         this->configuration = configuration;
         this->display = display;
         this->window = window;
+        this->root = root;
+
+        if(this->root == this->window) {
+                LOGGER_DEBUG("Window is root");
+                return DFWM_STATUS(DFWM_GENERIC_ERROR);
+        }
 
         DfwmStatus status = this->getWindowAttributes();
         if(!status.isOk()) {
                 return status;
         }
 
+        /* Check if the window is a popup */
+        if(this->xWindowAttributes.override_redirect) {
+                return DFWM_STATUS(DFWM_GENERIC_ERROR);
+        }
+
         if((ret = this->updateBorderWidth()) != DFWM_OK) {
                 return DFWM_STATUS(ret);
+        }
+
+        status = this->sendConfigureEvent();
+        if(!status.isOk()) {
+                return status;
         }
 
         if((ret = XSelectInput(this->display, this->window, EnterWindowMask | 
                                 FocusChangeMask | PropertyChangeMask |
                                 StructureNotifyMask)) != 0) {
                 LOGGER_ERR("XSelectInput: Bad Window");
-                return DFWM_STATUS(ret);
+                //return DFWM_STATUS(ret);
         }
 
-        if((ret = this->map()) != 0) {
-                return DFWM_STATUS(ret);
+        if((ret = XRaiseWindow(this->display, this->window) != 0)) {
+                LOGGER_ERR("Failed to raise window");
+                //return DFWM_STATUS(ret);
         }
+
+        XChangeProperty(this->display, this->root, XInternAtom(this->display, "_NET_CLIENT_LIST", False),
+                        XA_WINDOW, 32, PropModeAppend, (unsigned char*) 
+                        &(this->window), 1);
+
+        status = this->resize(this->xWindowAttributes.x, this->xWindowAttributes.y,
+                        this->xWindowAttributes.width, this->xWindowAttributes.height);
+        if(!status.isOk()) {
+                //return status;
+        }
+
+        this->setClientState(NormalState);
+        this->map();
 
         return DFWM_STATUS(DFWM_OK);
 }
 
+void DfwmWindow::setClientState(long state) {
+        long data[] = { state, None };
+
+        XChangeProperty(this->display, this->window, 
+                        XInternAtom(this->display, "WM_STATE", False),
+                        XInternAtom(this->display, "WM_STATE", False),
+                        32, PropModeReplace, (unsigned char*)data, 2);
+}
+
 DfwmStatus DfwmWindow::getWindowAttributes() {
-        int ret = XGetWindowAttributes(this->display, this->window, 
-                                &this->xWindowAttributes);
-        return DFWM_STATUS(ret);
+        if(!XGetWindowAttributes(this->display, this->window, 
+                                &this->xWindowAttributes)) {
+                return DFWM_STATUS(DFWM_GENERIC_ERROR);
+        }
+        return DFWM_STATUS(DFWM_OK);
 }
 
 DfwmStatus DfwmWindow::resize(int x, int y, int width, int height) {
@@ -80,7 +124,7 @@ DfwmStatus DfwmWindow::resize(int x, int y, int width, int height) {
         if((ret = XMoveResizeWindow(this->display, this->window, x,
                                         y, width, height)
                                 != 0)) {
-                DFWM_STATUS(ret);
+                return DFWM_STATUS(ret);
         }
 
         return this->getWindowAttributes();
@@ -153,4 +197,27 @@ int DfwmWindow::updateBorderWidth() {
         }
 
         return DFWM_OK;
+}
+
+DfwmStatus DfwmWindow::sendConfigureEvent() {
+        XConfigureEvent ce;
+        
+        ce.type = ConfigureNotify;
+        ce.display = this->display;
+        ce.event = this->window;
+        ce.window = this->window;
+        ce.x = this->xWindowAttributes.x;
+        ce.y = this->xWindowAttributes.y;
+        ce.width = this->xWindowAttributes.width;
+        ce.height = this->xWindowAttributes.height;
+        ce.border_width = this->xWindowAttributes.border_width;
+        ce.above = None;
+        ce.override_redirect = False;
+        
+        if(XSendEvent(this->display, this->window, False, StructureNotifyMask, 
+                                (XEvent *) &ce) == 0) {
+                DFWM_STATUS(DFWM_GENERIC_ERROR);
+        }
+
+        return DFWM_STATUS(DFWM_OK);
 }

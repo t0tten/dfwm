@@ -1,5 +1,6 @@
 #include "../include/Dfwm.h"
 #include "../include/logger.h"
+#include "../include/DfwmWindow.h"
 
 Dfwm::Dfwm () {
 	disp = XOpenDisplay(NULL);
@@ -70,6 +71,7 @@ Window* Dfwm::findAllWindows(unsigned int &nrOfWindows) {
 }
 
 void Dfwm::init () {
+        this->configuration = new Configuration();
 	this->screen 	= DefaultScreen(disp);
 	this->sWidth 	= XDisplayWidth(disp, screen);
 	this->sHeight	= XDisplayHeight(disp, screen);
@@ -172,28 +174,17 @@ void Dfwm::initAtoms() {
 	WM_TAKE_FOCUS			= XInternAtom(disp, "WM_TAKE_FOCUS", False);
 	WM_STATE			= XInternAtom(disp, "NET_STATE", False);
 
-	std::cout << "Har1" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_CLIENT_LIST, 1);
-	std::cout << "Har2" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE_NORMAL, 1);
-	std::cout << "Har3" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE, 1);
-	std::cout << "Har4" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_STATE, 1);
-	std::cout << "Har5" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_SUPPORTED, 1);
-	std::cout << "Har6" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_ACTIVE_WINDOW, 1);
-	std::cout << "Har7" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_NAME, 1);
-	std::cout << "Har8" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_STATE_FULLSCREEN, 1);
-	std::cout << "Har9" << std::endl;
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE_DIALOG, 1);
-	std::cout << "Har10" << std::endl;
 	
         XDeleteProperty(disp, root, NET_CLIENT_LIST);
-	std::cout << "Har11" << std::endl;
 }
 
 
@@ -242,39 +233,15 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 }
 
 void Dfwm::checkWindow(Window window) {
-	/*std::cout << "CheckWindow: " << window << std::endl;
-	if(windowIsNotDfwm(window) && window != 0) {
-		std::cout << "Steg2" << std::endl;
-		XWindowAttributes wndAttr;
-		if(XGetWindowAttributes(disp, window, &wndAttr)) {
-			std::cout << "Steg3" << std::endl;
 
-			if(!wndAttr.override_redirect) {
-				std::cout << "ITS VIEWABLE" << std::endl;
-
-				Atom type;
-				Atom* atoms;
-				unsigned long len, remain;
-				int form;
-				if(XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms) == Success ) {
-					std::cout << "GotProperty, len: " << (int)len << std::endl;
-					for(int i = 0; i < (int)len; i++) {
-						std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
-						if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {*/
-							std::cout << "NORMAL" << std::endl;
-							addWindowToDesktop(window);
-				//		}	
-				//	}
-					/*if((int)len == 0) {
-						addWindowToDesktop(window);
-						XMapWindow(disp, window);
-						//XMapSubwindows(disp, window);
-					}*/
-
-		/*		} else std::cout << "CantGetProperty" << std::endl;
-			}
-		}
-	}*/
+        DfwmWindow win = DfwmWindow();
+        DfwmStatus status = win.init(configuration, this->disp, window, root);
+        if(status.isOk()) {
+                LOGGER_DEBUG("Status is OK");
+                addWindowToDesktop(win.getWindow());
+        } else {
+                LOGGER_DEBUG("FAILED TO INIT WINDOW");
+        }
 	
 }
 
@@ -285,7 +252,6 @@ void Dfwm::handleXEvent() {
                         break;
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
-                        LOGGER_INFO("Button pressed");
                         break;
                 case KeyRelease:
                         keys->translate_KeyUp(this, &e.xkey);
@@ -331,16 +297,14 @@ void Dfwm::handleXEvent() {
                         break;
                 case MapNotify:
                        	LOGGER_INFO("MapNotify");
-			std::cout << "MapNotify" << std::endl;
                         break;
                 case MapRequest:
                         LOGGER_INFO("MapRequest");
-			std::cout << "MapRequest" << std::endl;
 			checkWindow(e.xmaprequest.window);
 			redraw();
                         break;
                 case PropertyNotify:
-                        LOGGER_INFO("PropertyNotify");
+                        //LOGGER_INFO("PropertyNotify");
                         break;
                 case UnmapNotify: 
                         LOGGER_INFO("UnmapNotify");
@@ -483,22 +447,11 @@ bool Dfwm::windowIsNotDfwm(Window window) {
 }
 
 void Dfwm::grabFocused(Window window, int mode) {
-	LOGGER_DEBUGF("grabFocused on window: %lu", window);
-	std::cout << "grabFocused" << std::endl;
 	if(windowIsNotDfwm(window) && window != 0) {
 		XWindowAttributes wndAttr;
 		XGetWindowAttributes(disp, window, &wndAttr);
 
-		if(mode == NotifyNormal) {
-                	LOGGER_DEBUG( "NotifyNormal");
-        	} else if(mode == NotifyGrab) {
-               		LOGGER_DEBUG( "NotifyGrab");
-        	} else if(mode == NotifyUngrab) {
-        	        LOGGER_DEBUG( "NotifyUngrab");
-        	}
-	
 		if(mode != NotifyUngrab && wndAttr.map_state == IsViewable) {
-			LOGGER_DEBUG( "ENTERING IF STATEMENT!");;
 			Atom type;
 			Atom* atoms;
 			unsigned long len, remain;
