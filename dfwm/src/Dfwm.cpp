@@ -71,7 +71,6 @@ Window* Dfwm::findAllWindows(unsigned int &nrOfWindows) {
 
 void Dfwm::init () {
 	this->screen 	= DefaultScreen(disp);
-
 	this->sWidth 	= XDisplayWidth(disp, screen);
 	this->sHeight	= XDisplayHeight(disp, screen);
 	this->root	= RootWindow(disp, screen);	
@@ -80,11 +79,38 @@ void Dfwm::init () {
 	if(maxDesktops <= 0) maxDesktops = 1;
 
 	/* Change property of root */
+	initAtoms();
 	XSetWindowAttributes rootNewAttr;
 	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
 	XChangeWindowAttributes(disp, root, CWEventMask|CWCursor, &rootNewAttr);
 	XSelectInput(disp, root, rootNewAttr.event_mask);
+	std::cout << "Har" << std::endl;
 	
+	//initAtoms();
+
+	// --------------------------------------------------------
+	// DWM
+	
+	/* EWMH support per view */
+        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_CLIENT_LIST, 1);
+        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_WINDOW_TYPE, 1);
+        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_WINDOW_TYPE_NORMAL, 1);
+        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_STATE, 1);
+	//NET_CLIENT_LIST;
+	//NET_WM_WINDOW_TYPE;
+	//NET_WM_WINDOW_TYPE_NORMAL;
+	//NET_WM_STATE;
+
+        //XDeleteProperty(disp, root, NET_CLIENT_LIST);
+        /* select for events */
+        //wa.cursor = cursor[CurNormal]->cursor;
+        //wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask|PointerMotionMask
+         //               |EnterWindowMask|LeaveWindowMask|StructureNotifyMask|PropertyChangeMask;
+        //XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
+        //XSelectInput(dpy, root, wa.event_mask);
+
+	// ---------------------------------------------------------
+
 	/* Find all open windows */
 	this->size 	= 20;
 	this->nrOfMapped= 0;
@@ -98,12 +124,12 @@ void Dfwm::init () {
 	XGetWindowAttributes(disp, root, &rootAttr);
 
 	XSelectInput (disp, root, EVENT_MASK | SubstructureRedirectMask);
-
 	XMapWindow (disp, root);
+	
+	/* Add windows to dfwm */
 	this->selected 	= 1;
 	this->running 	= true;
 	this->keys 	= new KeyBindings(disp);
-
 	this->bar 	= new StatusBar(disp, &root, &selected);
 	this->menu 	= new Menu(disp, &root, 150, &selected, maxDesktops);
 	this->bar->redraw();
@@ -129,6 +155,47 @@ void Dfwm::init () {
 	delete[] windows;
 	this->desktop[selected - 1]->show();
 }
+
+void Dfwm::initAtoms() {
+	NET_CLIENT_LIST 		= XInternAtom(disp, "_NET_CLIENT_LIST", False);
+	NET_WM_WINDOW_TYPE_NORMAL 	= XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+	NET_WM_WINDOW_TYPE 		= XInternAtom(disp, "_NET_WM_WINDOW_TYPE", False);
+	NET_WM_STATE 			= XInternAtom(disp, "_NET_WM_STATE", False);
+	NET_SUPPORTED			= XInternAtom(disp, "_NET_SUPPORTED", False);
+	NET_ACTIVE_WINDOW 		= XInternAtom(disp, "_NET_ACTIVE_WINDOW", False);
+	NET_WM_NAME	 		= XInternAtom(disp, "_NET_WM_NAME", False);
+	NET_WM_STATE_FULLSCREEN		= XInternAtom(disp, "_NET_WM_STATE_FULLSCREEN", False);
+	NET_WM_WINDOW_TYPE_DIALOG 	= XInternAtom(disp, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+
+	WM_DELETE_WINDOW   		= XInternAtom(disp, "WM_DELETE_WINDOW", False);
+	WM_PROTOCOLS			= XInternAtom(disp, "WM_PROTOCOLS", False);
+	WM_TAKE_FOCUS			= XInternAtom(disp, "WM_TAKE_FOCUS", False);
+	WM_STATE			= XInternAtom(disp, "NET_STATE", False);
+
+	std::cout << "Har1" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_CLIENT_LIST, 1);
+	std::cout << "Har2" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE_NORMAL, 1);
+	std::cout << "Har3" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE, 1);
+	std::cout << "Har4" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_STATE, 1);
+	std::cout << "Har5" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_SUPPORTED, 1);
+	std::cout << "Har6" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_ACTIVE_WINDOW, 1);
+	std::cout << "Har7" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_NAME, 1);
+	std::cout << "Har8" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_STATE_FULLSCREEN, 1);
+	std::cout << "Har9" << std::endl;
+        XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE_DIALOG, 1);
+	std::cout << "Har10" << std::endl;
+	
+        XDeleteProperty(disp, root, NET_CLIENT_LIST);
+	std::cout << "Har11" << std::endl;
+}
+
 
 void Dfwm::addMapped(Window window) {
 	if(size <= nrOfMapped) {
@@ -168,9 +235,8 @@ void Dfwm::removeMapped(Window window) {
 
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
-	Atom NET_WM_STATE = XInternAtom(disp, "_NET_WM_STATE", True); 
 	if(xclient.message_type == NET_WM_STATE) {
-		addWindowToDesktop(xclient.window);
+		//addWindowToDesktop(xclient.window);
 	}
 }
 
@@ -189,17 +255,19 @@ void Dfwm::checkWindow(Window window) {
 				Atom* atoms;
 				unsigned long len, remain;
 				int form;
-				Atom NORMAL = XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True);
-				if(XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms) == Success ) {
+				if(XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms) == Success ) {
+					std::cout << "GotProperty, len: " << (int)len << std::endl;
 					for(int i = 0; i < (int)len; i++) {
 						std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
-						if(atoms[i] == NORMAL) {
+						if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
 							std::cout << "NORMAL" << std::endl;
 							addWindowToDesktop(window);
 						}	
 					}
+					addWindowToDesktop(window);
+					XMapWindow(disp, window);
 
-				}
+				} else std::cout << "CantGetProperty" << std::endl;
 			}
 		}
 	}
@@ -352,11 +420,11 @@ void Dfwm::addWindowToDesktop(Window window) {
         unsigned long len, remain;
         int form;
 
-        XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+        XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
         for(int i = 0; i < (int)len; i++) { 
                 LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
-                if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+                if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
 
                         this->desktop[selected - 1]->addWindow(window);
                         addMapped(window);
@@ -396,6 +464,7 @@ bool Dfwm::windowIsNotDfwm(Window window) {
 
 void Dfwm::grabFocused(Window window, int mode) {
 	LOGGER_DEBUGF("grabFocused on window: %lu", window);
+	std::cout << "grabFocused" << std::endl;
 	if(windowIsNotDfwm(window) && window != 0) {
 		XWindowAttributes wndAttr;
 		XGetWindowAttributes(disp, window, &wndAttr);
@@ -416,11 +485,10 @@ void Dfwm::grabFocused(Window window, int mode) {
 			int form;
 
 			try {
-				LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, XInternAtom(disp, "_NET_WM_WINDOW_TYPE", True), 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
-
+				LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
 				for(int i = 0; i < (int)len; i++) { 
 					LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
-					if(atoms[i] == XInternAtom(disp, "_NET_WM_WINDOW_TYPE_NORMAL", True)) {
+					if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
 						char* name;
 						if(XFetchName(disp, window, &name)) {
 							std::string s_name = name;
