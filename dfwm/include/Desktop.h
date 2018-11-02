@@ -31,7 +31,7 @@ class Desktop {
 		int findWindow(Window, Window*, int);
 
 		void expandArray(Window*&, int amount);
-		void resizeWindows();
+		//void resizeWindows();
 		void addWindow(Window, Window*&, int&);
 
 	public:
@@ -63,6 +63,8 @@ class Desktop {
 		Window popCurrentWindow();
                 
                 Window getCurrentFocusedWindow();
+		void resizeWindows();
+		bool windowExists(Window);
 };
 
 #endif //_DESKTOP_
