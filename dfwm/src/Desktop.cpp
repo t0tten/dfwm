@@ -179,25 +179,28 @@ void Desktop::addWindow(Window window, Window*& arr, int& size) {
         	XSelectInput(disp, window, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 
 		//-----
-		XConfigureEvent ce;
+		/*XConfigureEvent ce;
 
         	ce.type = ConfigureNotify;
         	ce.display = disp;
         	ce.event = window;
         	ce.window = window;
-        	ce.x = 100;
-        	ce.y = 100;
+        	ce.x = 0;
+        	ce.y = 0;
         	ce.width = 200;
         	ce.height = 200;
         	ce.border_width = 1;
         	ce.above = None;
         	ce.override_redirect = False;
-        	XSendEvent(disp, window, False, StructureNotifyMask, (XEvent *)&ce);	
+        	XSendEvent(disp, window, False, StructureNotifyMask, (XEvent *)&ce);*/
 		//-----
 		XChangeProperty(disp, *root, XInternAtom(disp, "_NET_CLIENT_LIST", False), XA_WINDOW, 32, PropModeAppend, (unsigned char *)&window, 1);	
 
 		XMapWindow(disp, window);
+		XMapSubwindows(disp, window);
+		//XClearArea(disp, window, 0,0, 500, 500, True);
 		std::cout << "efter change prop" << std::endl;
+		//XFlush(disp);
 	}
 }
 
@@ -303,6 +306,22 @@ void Desktop::resizeWindows() {
 		int wHeight	= (height - ((amountLeft + 1) * wgap) - y) / amountLeft;
 
 		for(int i = 0; i < amountLeft; i++) {
+			//--------
+			XConfigureEvent ce;
+
+                	ce.type = ConfigureNotify;
+               	 	ce.display = disp;
+               	 	ce.event = left[i];
+               	 	ce.window = left[i];
+               	 	ce.x = wX;
+               	 	ce.y = wY;
+               	 	ce.width = wWidth;
+               	 	ce.height = wHeight;
+               	 	ce.border_width = 1;
+               	 	ce.above = None;
+               	 	ce.override_redirect = False;
+               	 	XSendEvent(disp, left[i], False, StructureNotifyMask, (XEvent *)&ce);
+			//-------
 			XMoveResizeWindow(disp, left[i], wX, wY, wWidth, wHeight);
 			wY = wHeight + wgap + wY;
 		}	
@@ -317,6 +336,22 @@ void Desktop::resizeWindows() {
 		int wHeight	= (height - ((amountRight + 1) * wgap) - y) / amountRight;
 
 		for(int i = 0; i < amountRight; i++) {
+			//--------
+			XConfigureEvent ce;
+
+                	ce.type = ConfigureNotify;
+               	 	ce.display = disp;
+               	 	ce.event = right[i];
+               	 	ce.window = right[i];
+               	 	ce.x = wX;
+               	 	ce.y = wY;
+               	 	ce.width = wWidth;
+               	 	ce.height = wHeight;
+               	 	ce.border_width = 1;
+               	 	ce.above = None;
+               	 	ce.override_redirect = False;
+               	 	XSendEvent(disp, right[i], False, StructureNotifyMask, (XEvent *)&ce);
+			//-------
 			XMoveResizeWindow(disp, right[i], wX, wY, wWidth, wHeight);
 			wY = wHeight + wgap + wY;
 		}	
@@ -341,6 +376,7 @@ void Desktop::setCurrentFocusedWindow(Window window) {
 	XWindowChanges wChange;
 	wChange.border_width = BORDER_WIDTH;
 	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
+	resizeWindows();
 }
 
 bool Desktop::gotWindows() {
@@ -356,3 +392,20 @@ Window Desktop::popCurrentWindow() {
 	removeWindow(wnd);
 	return wnd;
 }
+
+bool Desktop::windowExists(Window window) {
+	int index = findWindow(window, left, amountLeft);
+	if(index == -1) index = findWindow(window, right, amountRight);
+
+	if(index == -1) return false;
+	else		return true;
+}
+
+
+
+
+
+
+
+
+

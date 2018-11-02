@@ -5,7 +5,7 @@
 
 enum Alignment {CENTER, LEFT, RIGHT};
 enum LauncherState {SHOWING, HIDING};
-static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask | FocusChangeMask | EnterWindowMask | PointerMotionMask;
+//static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask | FocusChangeMask | EnterWindowMask | PointerMotionMask;
 static long ROOT_EVENT_MASK		= SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask| FocusChangeMask;
 static int COL_SELECTED_BG 		= YELLOW;
 static int COL_SELECTED_FG 		= BLACK;
@@ -39,17 +39,10 @@ static Atom NET_WM_WINDOW_TYPE;
 static Atom NET_WM_WINDOW_TYPE_NORMAL;
 static Atom NET_WM_STATE;
 static Atom NET_SUPPORTED;
-static Atom NET_ACTIVE_WINDOW; //= XInternAtom(disp, "_NET_ACTIVE_WINDOW", False);
-static Atom NET_WM_NAME; //= XInternAtom(disp, "_NET_WM_NAME", False);
-static Atom NET_WM_STATE_FULLSCREEN; //= XInternAtom(disp, "_NET_WM_STATE_FULLSCREEN", False);
-static Atom NET_WM_WINDOW_TYPE_DIALOG; //= XInternAtom(disp, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-
-/*
-netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
-netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
-netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-*/
+static Atom NET_ACTIVE_WINDOW;
+static Atom NET_WM_NAME; 
+static Atom NET_WM_STATE_FULLSCREEN; 
+static Atom NET_WM_WINDOW_TYPE_DIALOG; 
 
 static Atom WM_DELETE_WINDOW;
 static Atom WM_PROTOCOLS;

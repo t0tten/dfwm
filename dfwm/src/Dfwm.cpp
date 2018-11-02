@@ -82,7 +82,7 @@ void Dfwm::init () {
 	initAtoms();
 	XSetWindowAttributes rootNewAttr;
 	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
-	XChangeWindowAttributes(disp, root, CWEventMask|CWCursor, &rootNewAttr);
+	XChangeWindowAttributes(disp, root, CWEventMask, &rootNewAttr);
 	XSelectInput(disp, root, rootNewAttr.event_mask);
 	std::cout << "Har" << std::endl;
 	
@@ -123,7 +123,7 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	XSelectInput (disp, root, EVENT_MASK | SubstructureRedirectMask);
+	XSelectInput (disp, root, ROOT_EVENT_MASK); //| SubstructureRedirectMask);
 	XMapWindow (disp, root);
 	
 	/* Add windows to dfwm */
@@ -235,13 +235,14 @@ void Dfwm::removeMapped(Window window) {
 
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
+	std::cout << XGetAtomName(disp, xclient.message_type) << std::endl;
 	if(xclient.message_type == NET_WM_STATE) {
 		//addWindowToDesktop(xclient.window);
 	}
 }
 
 void Dfwm::checkWindow(Window window) {
-	std::cout << "CheckWindow: " << window << std::endl;
+	/*std::cout << "CheckWindow: " << window << std::endl;
 	if(windowIsNotDfwm(window) && window != 0) {
 		std::cout << "Steg2" << std::endl;
 		XWindowAttributes wndAttr;
@@ -259,18 +260,21 @@ void Dfwm::checkWindow(Window window) {
 					std::cout << "GotProperty, len: " << (int)len << std::endl;
 					for(int i = 0; i < (int)len; i++) {
 						std::cout << XGetAtomName(disp, atoms[i]) << std::endl;
-						if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
+						if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {*/
 							std::cout << "NORMAL" << std::endl;
 							addWindowToDesktop(window);
-						}	
-					}
-					addWindowToDesktop(window);
-					XMapWindow(disp, window);
+				//		}	
+				//	}
+					/*if((int)len == 0) {
+						addWindowToDesktop(window);
+						XMapWindow(disp, window);
+						//XMapSubwindows(disp, window);
+					}*/
 
-				} else std::cout << "CantGetProperty" << std::endl;
+		/*		} else std::cout << "CantGetProperty" << std::endl;
 			}
 		}
-	}
+	}*/
 	
 }
 
@@ -292,13 +296,29 @@ void Dfwm::handleXEvent() {
                         break;
                 case ClientMessage:
 			std::cout << "ClientMessage" << std::endl;
-                        //translateClientMessage(e.xclient);
+                        translateClientMessage(e.xclient);
                         break;
                 case DestroyNotify:
                         removeWindowFromDesktop(e.xdestroywindow.window);
                         break;
                 case ConfigureRequest:
                         LOGGER_INFO("ConfigureRequest");
+			std::cout << "ConfigureRequest" << std::endl;
+			if(this->desktop[selected - 1]->windowExists(e.xconfigurerequest.window)) {
+				this->desktop[selected - 1]->resizeWindows();
+			} else {
+				XConfigureRequestEvent *ev = &e.xconfigurerequest;
+				XWindowChanges wc;
+
+				wc.x = ev->x;
+		                wc.y = ev->y;
+	        	        wc.width = ev->width;
+		                wc.height = ev->height;
+		                wc.border_width = ev->border_width;
+		                wc.sibling = ev->above;
+		                wc.stack_mode = ev->detail;
+		                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);
+			}
                         break;
                 case EnterNotify:
 			grabFocused(e.xcrossing.window, e.xcrossing.mode);
@@ -307,17 +327,17 @@ void Dfwm::handleXEvent() {
                         grabFocused(e.xfocus.window, e.xfocus.mode);
                         break;
                 case MappingNotify:
-                        LOGGER_INFO("MappingNotify");
+			LOGGER_INFO("MappingNotify");
                         break;
                 case MapNotify:
-                        LOGGER_INFO("MapNotify");
+                       	LOGGER_INFO("MapNotify");
 			std::cout << "MapNotify" << std::endl;
-			//checkWindow(e.xmap.window);
                         break;
                 case MapRequest:
                         LOGGER_INFO("MapRequest");
 			std::cout << "MapRequest" << std::endl;
 			checkWindow(e.xmaprequest.window);
+			redraw();
                         break;
                 case PropertyNotify:
                         LOGGER_INFO("PropertyNotify");
@@ -351,8 +371,8 @@ void Dfwm::run () {
                 select(x11_fd + 1, &in_fds, NULL, NULL, &tv);
 
                 while(XPending(disp)) {
-                        XNextEvent(disp, &e);
-                        this->handleXEvent();
+                	XNextEvent(disp, &e);
+                	this->handleXEvent();
                 }
 
                 if(count % 100 == 0) {
