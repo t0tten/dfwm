@@ -40,6 +40,7 @@ class Dfwm {
 		bool* desktopHaveWindow;
 		
 		void init();
+		void initAtoms();
 		Window* findAllWindows(unsigned int&);
 		bool windowIsNotDfwm(Window);
 		void drawGraphics(Window);

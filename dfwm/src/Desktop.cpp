@@ -168,16 +168,37 @@ void Desktop::swapFirstWindows() {
 
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window, Window*& arr, int& size)");
-	expandArray(arr, size);
-	XSetWindowBorder(disp, window, COL_BORDER);
-	
+	std::cout << "addWindow(asdasd)" << std::endl;
 	XWindowChanges wChange;
 	wChange.border_width = BORDER_WIDTH;
-	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
+	if(XConfigureWindow(disp, window, CWBorderWidth, &wChange) && XSetWindowBorder(disp, window, COL_BORDER)) {
+		expandArray(arr, size);
+		arr[size] = window;
+		size++;
+        	//XSelectInput(disp, window, EVENT_MASK);
+        	XSelectInput(disp, window, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 
-	arr[size] = window;
-	size++;
-        XSelectInput(disp, window, EVENT_MASK);
+		//-----
+		XConfigureEvent ce;
+
+        	ce.type = ConfigureNotify;
+        	ce.display = disp;
+        	ce.event = window;
+        	ce.window = window;
+        	ce.x = 100;
+        	ce.y = 100;
+        	ce.width = 200;
+        	ce.height = 200;
+        	ce.border_width = 1;
+        	ce.above = None;
+        	ce.override_redirect = False;
+        	XSendEvent(disp, window, False, StructureNotifyMask, (XEvent *)&ce);	
+		//-----
+		XChangeProperty(disp, *root, XInternAtom(disp, "_NET_CLIENT_LIST", False), XA_WINDOW, 32, PropModeAppend, (unsigned char *)&window, 1);	
+
+		XMapWindow(disp, window);
+		std::cout << "efter change prop" << std::endl;
+	}
 }
 
 void Desktop::addWindow(Window window) {
@@ -210,8 +231,6 @@ void Desktop::killCurrentWindow() {
 	LOGGER_DEBUG("void Desktop::killCurrentWindow()");
 	if(currFocus != -1) {
 		LOGGER_DEBUG("TRYING TO KILL");
-		Atom DELETE 	= XInternAtom(disp, "WM_DELETE_WINDOW", False);
-		Atom PROTO 	= XInternAtom(disp, "WM_PROTOCOLS", True);	
 		
 		XEvent eKill;
 		eKill.xclient.type = ClientMessage;
@@ -221,8 +240,6 @@ void Desktop::killCurrentWindow() {
 		eKill.xclient.data.l[0] = XInternAtom(disp, "WM_DELETE_WINDOW", false);
 		eKill.xclient.data.l[1] = CurrentTime;
 		XSendEvent(disp, currFocus, False, NoEventMask, &eKill);
-
-		//XDestroyWindow(disp, currFocus);
 	}
 }
 
