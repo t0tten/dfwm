@@ -35,7 +35,7 @@ class DfwmWindow {
                 Configuration *configuration;
                 Display *display;
                 //std::string name;
-                Window *window;
+                Window window;
                 XWindowAttributes xWindowAttributes;
                 XWindowChanges xWindowChanges;
 
@@ -43,9 +43,9 @@ class DfwmWindow {
                 DfwmWindow();
                 ~DfwmWindow();
 
-                DfwmStatus init(Configuration*, Display*, Window*);
+                DfwmStatus init(Configuration*, Display*, Window);
 
-                Window* getWindow();
+                Window getWindow();
 
                 int map();
                 int unmap();
@@ -57,6 +57,9 @@ class DfwmWindow {
                 int getY();
                 int getHeight();
                 int getWidth();
+
+                DfwmStatus getWindowAttributes();
+                DfwmStatus resize(int x, int y, int width, int height);
 };
 
 #endif

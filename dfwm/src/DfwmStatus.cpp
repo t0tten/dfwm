@@ -49,14 +49,44 @@ const char *DfwmStatus::getErrorMessage() {
                         return DFWM_GENERIC_ERROR_STR;
                 case DFWM_NULL_POINTER:
                         return DFWM_NULL_POINTER_STR;
-                case DFWM_BAD_WINDOW:
-                        return DFWM_BAD_WINDOW_STR;
-                case DFWM_BAD_DRAWABLE:
-                        return DFWM_BAD_DRAWABLE_STR;
-                case DFWM_BAD_MATCH:
-                        return DFWM_BAD_MATCH_STR;
+
+                /* Xorg Errors */
+                case DFWM_BAD_REQUEST:
+                        return DFWM_BAD_REQUEST_STR;
                 case DFWM_BAD_VALUE:
                         return DFWM_BAD_VALUE_STR;
+                case DFWM_BAD_WINDOW:
+                        return DFWM_BAD_WINDOW_STR;
+                case DFWM_BAD_PIXMAP:
+                        return DFWM_BAD_PIXMAP_STR;
+                case DFWM_BAD_ATOM:
+                        return DFWM_BAD_ATOM_STR;
+                case DFWM_BAD_CURSOR:;
+                        return DFWM_BAD_CURSOS_STR;
+                case DFWM_BAD_FONT:
+                        return DFWM_BAD_FONT_STR;
+                case DFWM_BAD_MATCH:
+                        return DFWM_BAD_MATCH_STR;     
+                case DFWM_BAD_DRAWABLE:
+                        return DFWM_BAD_DRAWABLE_STR;
+                case DFWM_BAD_ACCESS:
+                        return DFWM_BAD_ACCESS_STR;
+                case DFWM_BAD_ALLOC:
+                        return DFWM_BAD_ALLOC_STR;
+                case DFWM_BAD_COLOR:
+                        return DFWM_BAD_COLOR_STR;
+                case DFWM_BAD_GC:
+                        return DFWM_BAD_GC_STR;
+                case DFWM_BAD_ID_CHOICE:
+                        return DFWM_BAD_ID_CHOICE_STR;
+                case DFWM_BAD_NAME:
+                        return DFWM_BAD_NAME_STR;
+                case DFWM_BAD_LENGTH:
+                        return DFWM_BAD_LENGTH_STR;
+                case DFWM_BAD_IMPLEMENTATION:
+                        return DFWM_BAD_IMPLEMENTATION_STR;
+                 /* End Xorg Errors */
+
                 default:
                         return DFWM_UNKOWN_ERROR_STR;
         }

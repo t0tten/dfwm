@@ -34,10 +34,10 @@ DfwmWindow::~DfwmWindow() {
 }
 
 DfwmStatus DfwmWindow::init(Configuration* configuration, 
-                Display* display, Window* window) {
+                Display* display, Window window) {
         int ret;
 
-        if(configuration == NULL || display == NULL || window == NULL) {
+        if(configuration == NULL || display == NULL) {
                 return DFWM_STATUS(DFWM_NULL_POINTER);
         }
 
@@ -45,54 +45,62 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
         this->display = display;
         this->window = window;
 
-
-        if((ret = XGetWindowAttributes(this->display, *this->window, 
-                                &this->xWindowAttributes)) == 0) {
-                LOGGER_ERR("Failed to XGetWindowAttributes");
-                switch(ret) {
-                        case BadDrawable:
-                                return DFWM_STATUS(DFWM_BAD_DRAWABLE);
-                        case BadWindow:
-                                return DFWM_STATUS(DFWM_BAD_WINDOW);
-                        default:
-                                return DFWM_STATUS(DFWM_GENERIC_ERROR);
-                }
+        DfwmStatus status = this->getWindowAttributes();
+        if(!status.isOk()) {
+                return status;
         }
 
         if((ret = this->updateBorderWidth()) != DFWM_OK) {
                 return DFWM_STATUS(ret);
         }
 
-        if(XSelectInput(this->display, *this->window, EnterWindowMask | 
+        if((ret = XSelectInput(this->display, this->window, EnterWindowMask | 
                                 FocusChangeMask | PropertyChangeMask |
-                                StructureNotifyMask) == BadWindow) {
+                                StructureNotifyMask)) != 0) {
                 LOGGER_ERR("XSelectInput: Bad Window");
-                return DFWM_STATUS(DFWM_BAD_WINDOW);
+                return DFWM_STATUS(ret);
         }
 
-        if(this->map() == BadWindow) {
-                LOGGER_ERR("map: Bad Window");
-                return DFWM_STATUS(DFWM_BAD_WINDOW);
+        if((ret = this->map()) != 0) {
+                return DFWM_STATUS(ret);
         }
 
         return DFWM_STATUS(DFWM_OK);
 }
 
-Window* DfwmWindow::getWindow() {
+DfwmStatus DfwmWindow::getWindowAttributes() {
+        int ret = XGetWindowAttributes(this->display, this->window, 
+                                &this->xWindowAttributes);
+        return DFWM_STATUS(ret);
+}
+
+DfwmStatus DfwmWindow::resize(int x, int y, int width, int height) {
+        int ret;
+        
+        if((ret = XMoveResizeWindow(this->display, this->window, x,
+                                        y, width, height)
+                                != 0)) {
+                DFWM_STATUS(ret);
+        }
+
+        return this->getWindowAttributes();
+}
+
+Window DfwmWindow::getWindow() {
         return this->window;
 }
 
 
 int DfwmWindow::map() {
-        return XMapWindow(this->display, *this->window);
+        return XMapWindow(this->display, this->window);
 }
 
 int DfwmWindow::unmap() {
-        return XUnmapWindow(this->display, *this->window);
+        return XUnmapWindow(this->display, this->window);
 }
 
 int DfwmWindow::mapSubwindows() {
-        return XMapSubwindows(this->display, *this->window);
+        return XMapSubwindows(this->display, this->window);
 }
 
 int DfwmWindow::getX() {
@@ -116,7 +124,7 @@ int DfwmWindow::updateBorderWidth() {
         this->xWindowAttributes.border_width = this->configuration->
                 getBorderWidth();
 
-        if( !(ret = XConfigureWindow(this->display, *this->window, CWBorderWidth,
+        if( !(ret = XConfigureWindow(this->display, this->window, CWBorderWidth,
                         &this->xWindowChanges))) {
                 switch(ret) {
                         case BadMatch:
@@ -130,7 +138,7 @@ int DfwmWindow::updateBorderWidth() {
                 }
         }
 
-        if( !(ret = XSetWindowBorder(this->display, *this->window,
+        if( !(ret = XSetWindowBorder(this->display, this->window,
                                         this->configuration->getBorderColor()))) {
                 switch(ret) {
                         case BadMatch:

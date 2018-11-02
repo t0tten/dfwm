@@ -27,21 +27,48 @@
 
 #define DFWM_OK                 0
 #define DFWM_OK_STR             "OK"
-#define DFWM_GENERIC_ERROR      1
+#define DFWM_GENERIC_ERROR      1000
 #define DFWM_GENERIC_ERROR_STR  "Generic error"
-#define DFWM_UNKNOWN_ERROR      2
+#define DFWM_UNKNOWN_ERROR      1001 
 #define DFWM_UNKOWN_ERROR_STR   "Unknown error"
-#define DFWM_NULL_POINTER       3
+#define DFWM_NULL_POINTER       1002
 #define DFWM_NULL_POINTER_STR   "Null pointer"
 
-#define DFWM_BAD_WINDOW         100
-#define DFWM_BAD_WINDOW_STR     "Bad window"
-#define DFWM_BAD_DRAWABLE       101
-#define DFWM_BAD_DRAWABLE_STR   "Bad drawable"
-#define DFWM_BAD_MATCH          102
-#define DFWM_BAD_MATCH_STR      "Bad match"
-#define DFWM_BAD_VALUE          103
+/* Errors from X11/X.h */
+#define DFWM_BAD_REQUEST        1
+#define DFWM_BAD_REQUEST_STR    "Bad request"
+#define DFWM_BAD_VALUE          2
 #define DFWM_BAD_VALUE_STR      "Bad value"
+#define DFWM_BAD_WINDOW         3
+#define DFWM_BAD_WINDOW_STR     "Bad window"
+#define DFWM_BAD_PIXMAP         4
+#define DFWM_BAD_PIXMAP_STR     "Bad pixmap"
+#define DFWM_BAD_ATOM           5
+#define DFWM_BAD_ATOM_STR       "Bad atom"
+#define DFWM_BAD_CURSOR         6
+#define DFWM_BAD_CURSOS_STR     "Bad cursor"
+#define DFWM_BAD_FONT           7
+#define DFWM_BAD_FONT_STR       "Bad font"
+#define DFWM_BAD_MATCH          8
+#define DFWM_BAD_MATCH_STR      "Bad match"
+#define DFWM_BAD_DRAWABLE       9
+#define DFWM_BAD_DRAWABLE_STR   "Bad drawable"
+#define DFWM_BAD_ACCESS         10
+#define DFWM_BAD_ACCESS_STR     "Bad access"
+#define DFWM_BAD_ALLOC          11
+#define DFWM_BAD_ALLOC_STR      "Bad alloc"
+#define DFWM_BAD_COLOR          12
+#define DFWM_BAD_COLOR_STR      "Bad color"
+#define DFWM_BAD_GC             13
+#define DFWM_BAD_GC_STR         "Parameter not a GC"
+#define DFWM_BAD_ID_CHOICE      14
+#define DFWM_BAD_ID_CHOICE_STR  "Bad ID: choice not in range or alreeady used"
+#define DFWM_BAD_NAME           15
+#define DFWM_BAD_NAME_STR       "Font or color name does not exist"
+#define DFWM_BAD_LENGTH         16
+#define DFWM_BAD_LENGTH_STR     "Requst length incorrect"
+#define DFWM_BAD_IMPLEMENTATION 17
+#define DFWM_BAD_IMPLEMENTATION_STR "Server is defective"
 
 #endif
 
