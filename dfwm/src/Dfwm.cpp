@@ -236,14 +236,18 @@ void Dfwm::checkWindow(Window window) {
 }
 
 void Dfwm::buttonPress(XButtonPressedEvent *ev) {
-        
+                this->refocus(ev->window);
+}
+
+void Dfwm::refocus(Window window) {
         Window oldFocus = this->desktop[selected - 1]->getCurrentFocusedWindow();
         if(oldFocus != -1) {
                 dfwm::unfocus(this->disp, this->root, oldFocus);
         }
         
-        dfwm::focus(this->disp, this->root, ev->window);
-        this->desktop[selected - 1]->setCurrentFocusedWindow(ev->window);
+        dfwm::focus(this->disp, this->root, window);
+        this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+
 }
 
 void Dfwm::handleXEvent() {
@@ -370,6 +374,8 @@ void Dfwm::configureRequest(XConfigureRequestEvent *ev) {
                 
                 addMapped(ev->window);
         }
+
+        this->refocus(ev->window);
 
         XSync(this->disp, False);
 }

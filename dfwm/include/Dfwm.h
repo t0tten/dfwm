@@ -57,6 +57,8 @@ class Dfwm {
                 void unmapNotify(XUnmapEvent *ev);
                 void buttonPress(XButtonPressedEvent *ev);
 
+                void refocus(Window window);
+
 	public:
 		Dfwm();
 		Dfwm(std::string);
