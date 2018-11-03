@@ -64,26 +64,20 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
                 return DFWM_STATUS(DFWM_GENERIC_ERROR);
         }
 
-        if((ret = this->updateBorderWidth()) != DFWM_OK) {
+        /*if((ret = this->updateBorderWidth()) != DFWM_OK) {
                 return DFWM_STATUS(ret);
-        }
+        }*/
 
         status = this->sendConfigureEvent();
         if(!status.isOk()) {
                 return status;
         }
 
-        if((ret = XSelectInput(this->display, this->window, EnterWindowMask | 
-                                FocusChangeMask | PropertyChangeMask |
-                                StructureNotifyMask)) != 0) {
-                LOGGER_ERR("XSelectInput: Bad Window");
-                //return DFWM_STATUS(ret);
-        }
+        XSelectInput(this->display, this->window, EnterWindowMask | 
+                        FocusChangeMask | PropertyChangeMask |
+                        StructureNotifyMask);
 
-        if((ret = XRaiseWindow(this->display, this->window) != 0)) {
-                LOGGER_ERR("Failed to raise window");
-                //return DFWM_STATUS(ret);
-        }
+        XRaiseWindow(this->display, this->window);
 
         XChangeProperty(this->display, this->root, XInternAtom(this->display, "_NET_CLIENT_LIST", False),
                         XA_WINDOW, 32, PropModeAppend, (unsigned char*) 

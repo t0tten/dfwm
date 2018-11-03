@@ -70,6 +70,11 @@ Window* Dfwm::findAllWindows(unsigned int &nrOfWindows) {
 	return windows;
 }
 
+int errorHandler(Display *d, XErrorEvent *e) {
+        DFWM_STATUS(e->error_code).logError();
+        return 0;
+}
+
 void Dfwm::init () {
         this->configuration = new Configuration();
 	this->screen 	= DefaultScreen(disp);
@@ -134,6 +139,8 @@ void Dfwm::init () {
 
 	delete[] windows;
 	this->desktop[selected - 1]->show();
+
+        XSetErrorHandler(errorHandler);
 }
 
 void Dfwm::initAtoms() {
@@ -167,6 +174,12 @@ void Dfwm::initAtoms() {
 
 
 void Dfwm::addMapped(Window window) {
+        for(int i=0; i < nrOfMapped; i++) {
+                if(window == mapped[i]) {
+                        LOGGER_ERRF("Windows %lu is already mapped", window);
+                        return;
+                }
+        }
 	if(size <= nrOfMapped) {
 		size *= 2;
 		Window* tmp = new Window[size];
@@ -198,7 +211,9 @@ void Dfwm::removeMapped(Window window) {
 		}
 
 		nrOfMapped--;
-	}
+	} else {
+                LOGGER_ERRF("Trying to remove unmapped window %lu", window);
+        }
 	
 }
 
@@ -243,31 +258,14 @@ void Dfwm::handleXEvent() {
                         translateClientMessage(e.xclient);
                         break;
                 case DestroyNotify:
+                        XUnmapWindow(this->disp, e.xdestroywindow.window);
                         removeWindowFromDesktop(e.xdestroywindow.window);
+                        XSync(this->disp, False);
                         break;
                 case ConfigureRequest:
                         LOGGER_INFO("ConfigureRequest");
 
-			if(this->desktop[selected - 1]->windowExists(e.xconfigurerequest.window)) {
-				this->desktop[selected - 1]->resizeWindows();
-			} else {
-                                LOGGER_INFO("Unknown window");
-				XConfigureRequestEvent *ev = &e.xconfigurerequest;
-				/*XWindowChanges wc;
-
-				wc.x = ev->x;
-		                wc.y = ev->y;
-	        	        wc.width = ev->width;
-		                wc.height = ev->height;
-		                wc.border_width = ev->border_width;
-		                wc.sibling = ev->above;
-		                wc.stack_mode = ev->detail;
-		                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);*/
-
-                                checkWindow(ev->window);
-			}
-
-                        XSync(this->disp, False);
+                        this->configureRequest(&e.xconfigurerequest);
                         break;
                 case EnterNotify:
 			grabFocused(e.xcrossing.window, e.xcrossing.mode);
@@ -287,16 +285,86 @@ void Dfwm::handleXEvent() {
 			redraw();
                         break;
                 case PropertyNotify:
-                        LOGGER_INFO("PropertyNotify");
+                        LOGGER_INFOF("PropertyNotify %lu", e.xproperty.window);
                         this->propertyNotify(&e.xproperty);
                         break;
                 case UnmapNotify: 
-                        LOGGER_INFO("UnmapNotify");
+                        LOGGER_INFOF("UnmapNotify: %lu", e.xunmap.window);
+                        unmapNotify(&e.xunmap);
+                        XSync(this->disp, False);
                         break;
 		//case MotionNotify:
 			//std::cout << "MotionNotify" << std::endl;
 			//break;
         }
+}
+
+void Dfwm::unmapNotify(XUnmapEvent *ev) {
+        if(ev->send_event) {
+                LOGGER_INFO("send_event");
+                /*long data[] = { WithdrawnState, None };
+
+                XChangeProperty(this->disp, ev->window, 
+                        XInternAtom(this->disp, "WM_STATE", False),
+                        XInternAtom(this->disp, "WM_STATE", False),
+                        32, PropModeReplace, (unsigned char*)data, 2);*/
+        } else {
+                XGrabServer(this->disp);
+                LOGGER_INFO("GRABBED");
+                removeWindowFromDesktop(ev->window);
+                XSync(this->disp, False);
+                LOGGER_INFO("HERP");
+                XUngrabServer(this->disp);
+
+                LOGGER_INFO("DERP");
+        }
+}
+
+void Dfwm::configureRequest(XConfigureRequestEvent *ev) {
+        bool shouldBeTiled = false;
+        if(this->desktop[selected - 1]->windowExists(ev->window)) {
+                this->desktop[selected - 1]->resizeWindows();
+                //DfwmWindow win = DfwmWindow();
+                //DfwmStatus status = win.init(configuration, this->disp, ev->window, root);
+
+                return;
+        } 
+
+        Atom type;
+        Atom* atoms;
+        unsigned long len, remain;
+        int form;
+
+        XGetWindowProperty(disp, ev->window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
+
+        if(len == 0) {
+                shouldBeTiled = true;
+        } else {
+                for(int i = 0; i < (int)len; i++) { 
+                        if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
+                                shouldBeTiled = true;
+                        } 
+                }
+        }
+
+        if(shouldBeTiled) {
+                checkWindow(ev->window);
+        } else {
+                XWindowChanges wc;
+
+                wc.x = ev->x;
+                wc.y = ev->y;
+                wc.width = ev->width;
+                wc.height = ev->height;
+                wc.border_width = ev->border_width;
+                wc.sibling = ev->above;
+                wc.stack_mode = ev->detail;
+                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);
+                
+                addMapped(ev->window);
+        }
+
+        XSync(this->disp, False);
 }
 
 void Dfwm::propertyNotify(XPropertyEvent *ev) {
@@ -323,7 +391,7 @@ void Dfwm::run () {
                 FD_ZERO(&in_fds);
                 FD_SET(x11_fd, &in_fds);
 
-                tv.tv_usec = 50;
+                tv.tv_usec = 500;
                 tv.tv_sec = 0;
 
                 select(x11_fd + 1, &in_fds, NULL, NULL, &tv);
@@ -389,9 +457,9 @@ void Dfwm::drawGraphics(Window window) {
 }
 
 void Dfwm::addWindowToDesktop(Window window) {
-	LOGGER_DEBUG("addWindowToDesktop");
-	XWindowAttributes wndAttr;
-	XGetWindowAttributes(disp, window, &wndAttr);
+	LOGGER_DEBUGF("addWindowToDesktop %lu", window);
+	//XWindowAttributes wndAttr;
+	//XGetWindowAttributes(disp, window, &wndAttr);
         
         Atom type;
         Atom* atoms;
@@ -402,7 +470,7 @@ void Dfwm::addWindowToDesktop(Window window) {
 
         if(len == 0) {
                 this->desktop[selected - 1]->addWindow(window);
-                addMapped(window);
+                //addMapped(window);
         }
 
 
@@ -410,9 +478,11 @@ void Dfwm::addWindowToDesktop(Window window) {
                 LOGGER_DEBUGF("addWinToDesk: %d:%s", i, XGetAtomName(disp, atoms[i]));
                 if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
                         this->desktop[selected - 1]->addWindow(window);
-                        addMapped(window);
+                        //addMapped(window);
                 } 
         }
+
+        addMapped(window);
 }
 
 void Dfwm::removeWindowFromDesktop(Window window) {

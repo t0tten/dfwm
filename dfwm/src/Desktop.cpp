@@ -188,6 +188,7 @@ void Desktop::addWindow(Window window) {
 int Desktop::findWindow(Window window, Window* arr, int size) {
 	bool found = false;
 	int index = -1;
+        int i;
 	for(int i = 0; i < size && !found; i++) {
 		if(arr[i] == window) {
 			found	= true;
@@ -200,7 +201,10 @@ int Desktop::findWindow(Window window, Window* arr, int size) {
 
 void Desktop::killCurrentWindow() {
 	LOGGER_DEBUG("void Desktop::killCurrentWindow()");
-	if(currFocus != -1) {
+
+	if(currFocus != -1 && this->windowExists(currFocus)) {
+                XGrabServer(this->disp);
+
 		LOGGER_DEBUG("TRYING TO KILL");
 		
 		XEvent eKill;
@@ -211,13 +215,21 @@ void Desktop::killCurrentWindow() {
 		eKill.xclient.data.l[0] = XInternAtom(disp, "WM_DELETE_WINDOW", false);
 		eKill.xclient.data.l[1] = CurrentTime;
 		XSendEvent(disp, currFocus, False, NoEventMask, &eKill);
+
+                //XUnmapWindow(this->disp, currFocus);
+                //removeWindow(currFocus);
+
+                XSync(this->disp, False);
+                XUngrabServer(this->disp);
 	}
 }
 
 bool Desktop::removeWindow(Window window) {
-	LOGGER_DEBUGF("removeWindow: %lu", window);
+	LOGGER_DEBUGF("removeWindow: %lu, left=%d, right=%d", window, 
+                        amountLeft, amountRight);
 
-	if(window != 0) {
+	if(window != 0 && window != *this->root && this->windowExists(window)) {
+
 		/* Search left side */
 		int index	= -1;
 		bool isLeft	= true;
@@ -241,8 +253,14 @@ bool Desktop::removeWindow(Window window) {
 			}		
 					
 			if(amountLeft <= 0 && amountRight > 0) moveToLeft(right[0]);
-			resizeWindows();
+
+                        if(amountLeft > 0) {
+                                resizeWindows();
+                        }
 		}
+
+	        LOGGER_DEBUGF("removed window: %lu, left=%d, right=%d", window, 
+                                amountLeft, amountRight);
 	}
 }
 
@@ -259,6 +277,7 @@ void Desktop::expandArray(Window*& arr, int amount) {
 }
 
 void Desktop::resizeWindows() {
+        LOGGER_INFO("resizing windows()");
 
 	/* Resize windows on the left side */
 	if(amountLeft > 0) {
@@ -355,6 +374,7 @@ Window Desktop::popCurrentWindow() {
 }
 
 bool Desktop::windowExists(Window window) {
+        LOGGER_DEBUG("CHECKING FOR WINDOW");
 	int index = findWindow(window, left, amountLeft);
 	if(index == -1) index = findWindow(window, right, amountRight);
 
