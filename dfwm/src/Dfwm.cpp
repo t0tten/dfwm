@@ -253,7 +253,7 @@ void Dfwm::handleXEvent() {
 			} else {
                                 LOGGER_INFO("Unknown window");
 				XConfigureRequestEvent *ev = &e.xconfigurerequest;
-				XWindowChanges wc;
+				/*XWindowChanges wc;
 
 				wc.x = ev->x;
 		                wc.y = ev->y;
@@ -262,7 +262,7 @@ void Dfwm::handleXEvent() {
 		                wc.border_width = ev->border_width;
 		                wc.sibling = ev->above;
 		                wc.stack_mode = ev->detail;
-		                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);
+		                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);*/
 
                                 checkWindow(ev->window);
 			}
@@ -400,10 +400,15 @@ void Dfwm::addWindowToDesktop(Window window) {
 
         XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms);
 
-        for(int i = 0; i < (int)len; i++) { 
-                LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
-                if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
+        if(len == 0) {
+                this->desktop[selected - 1]->addWindow(window);
+                addMapped(window);
+        }
 
+
+        for(int i = 0; i < (int)len; i++) { 
+                LOGGER_DEBUGF("addWinToDesk: %d:%s", i, XGetAtomName(disp, atoms[i]));
+                if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
                         this->desktop[selected - 1]->addWindow(window);
                         addMapped(window);
                 } 
