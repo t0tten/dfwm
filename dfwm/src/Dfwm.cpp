@@ -90,8 +90,8 @@ void Dfwm::init () {
 	XSetWindowAttributes rootNewAttr;
 	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
 	XChangeWindowAttributes(disp, root, CWEventMask, &rootNewAttr);
-	//XSelectInput(disp, root, rootNewAttr.event_mask);
-        //
+
+	XSelectInput(disp, root, ROOT_EVENT_MASK);
         XSelectInput(disp, root, SubstructureRedirectMask|
                         SubstructureNotifyMask|ButtonPressMask|
                         PointerMotionMask);
@@ -243,6 +243,9 @@ void Dfwm::handleXEvent() {
                 case Expose:
                         drawGraphics(e.xexpose.window);
                         break;
+                case ButtonPress:
+                        LOGGER_INFO("ButtonPress");
+                        break;
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
                         break;
@@ -254,12 +257,14 @@ void Dfwm::handleXEvent() {
                         XRefreshKeyboardMapping(&e.xmapping);
                         break;
                 case ClientMessage:
-			std::cout << "ClientMessage" << std::endl;
                         translateClientMessage(e.xclient);
                         break;
                 case DestroyNotify:
                         XUnmapWindow(this->disp, e.xdestroywindow.window);
-                        removeWindowFromDesktop(e.xdestroywindow.window);
+
+                        if(this->desktop[selected - 1]->windowExists(e.xdestroywindow.window)) {
+                                removeWindowFromDesktop(e.xdestroywindow.window);
+                        }
                         XSync(this->disp, False);
                         break;
                 case ConfigureRequest:
@@ -293,9 +298,6 @@ void Dfwm::handleXEvent() {
                         unmapNotify(&e.xunmap);
                         XSync(this->disp, False);
                         break;
-		//case MotionNotify:
-			//std::cout << "MotionNotify" << std::endl;
-			//break;
         }
 }
 
@@ -310,13 +312,9 @@ void Dfwm::unmapNotify(XUnmapEvent *ev) {
                         32, PropModeReplace, (unsigned char*)data, 2);*/
         } else {
                 XGrabServer(this->disp);
-                LOGGER_INFO("GRABBED");
-                removeWindowFromDesktop(ev->window);
+                //removeWindowFromDesktop(ev->window);
                 XSync(this->disp, False);
-                LOGGER_INFO("HERP");
                 XUngrabServer(this->disp);
-
-                LOGGER_INFO("DERP");
         }
 }
 
@@ -374,6 +372,29 @@ void Dfwm::propertyNotify(XPropertyEvent *ev) {
                 LOGGER_INFO("PropertyDelete");
         } else if(this->desktop[selected - 1]->windowExists(ev->window)) {
                 LOGGER_INFO("Window Exists");
+
+                switch(ev->atom) {
+                        case XA_WM_TRANSIENT_FOR:
+                                LOGGER_INFO("XA_WM_TRANSIENT_FOR");
+                                break;
+                        case XA_WM_NORMAL_HINTS:
+                                LOGGER_INFO("XA_WM_NORMAL_HINTS");
+                                break;
+                        case XA_WM_HINTS:
+                                LOGGER_INFO("XA_WM_HINTS");
+                                break;
+                        default:
+                                LOGGER_INFO("DEFAULT");
+                                break;
+                }
+
+                if(ev->atom == XA_WM_NAME || ev->atom == XInternAtom(this->disp, "_NET_WM_NAME", False)) {
+                        LOGGER_INFO("HERE");
+                }
+
+                if(ev->atom == XInternAtom(this->disp, "_NET_WM_WINDOW_TYPE", False)) {
+                        LOGGER_INFO("WINDOW TYPE");
+                }
         }
 }
 
@@ -493,22 +514,18 @@ void Dfwm::removeWindowFromDesktop(Window window) {
 bool Dfwm::windowIsNotDfwm(Window window) {
 	if (window == this->bar->getWindowID()) {
 		LOGGER_DEBUG("Window is bar");
-		std::cout << "Window is bar" << std::endl;
  		return false;
 	}
 	else if (window == this->menu->getWindowID()) {
 		LOGGER_DEBUG("Window is menu");
-		std::cout << "Window is menu" << std::endl;
 		return false; 
 	}
 	else if (window == this->launcher->getWindowID()) { 
 		LOGGER_DEBUG("Window is launcher");
-		std::cout << "Window is launcher" << std::endl;
 		return false;
 	}
 	else if (window == this->root) {
 		LOGGER_DEBUG("Window is root");
-		std::cout << "Window is root" << std::endl;
 		return false;
 	}
 

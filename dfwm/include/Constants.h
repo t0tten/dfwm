@@ -3,35 +3,37 @@
 
 #include "./Color.h"
 
+#define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
+#define ROOT_EVENT_MASK         (SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask|PointerMotionMask)
+
 enum Alignment {CENTER, LEFT, RIGHT};
 enum LauncherState {SHOWING, HIDING};
-//static long EVENT_MASK			= ExposureMask | KeyPressMask | KeyReleaseMask | ButtonReleaseMask | SubstructureNotifyMask | FocusChangeMask | EnterWindowMask | PointerMotionMask;
-static long ROOT_EVENT_MASK		= SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask| FocusChangeMask;
-static int COL_SELECTED_BG 		= YELLOW;
-static int COL_SELECTED_FG 		= BLACK;
-static int COL_MENU_BG			= GRAY;
-static int WINDOW_GAP			= 10;
-static int COL_MENU_DESKTOP_BG		= GRAY;
-static int COL_MENU_DESKTOP_FG		= LGT_GRAY;
-static int COL_MENU_DESKTOP_IND_POP	= GREEN;
-static int COL_MENU_DESKTOP_IND_EMPTY	= MEDIUM_GRAY2;
-static int COL_MENU_SETTINGS_BG		= GRAY;
-static int COL_MENU_SETTINGS_FG		= LGT_GRAY;
-static int COL_STATUS_BAR_BG		= GRAY;
-static int COL_STATUS_BAR_CLOCK		= WHITE;
-static int COL_STATUS_BAR_TITLE		= YELLOW;
-static int COL_STATUS_BAR_INFO		= WHITE;
-static int COL_STATUS_BAR_DESKTOP_FG	= BLACK;
-static int COL_STATUS_BAR_DESKTOP_BG	= YELLOW;
-static int COL_BORDER_SELECTED		= YELLOW;
-static int COL_BORDER			= LGT_GRAY;
-static int COL_LAUNCHER_BG		= GRAY;
-static int COL_LAUNCHER_FG		= LGT_GRAY;
-static int COL_LAUNCHER_RESULT_BG	= MEDIUM_GRAY2;
-static int COL_LAUNCHER_RESULT_SEL_BG	= MEDIUM_GRAY;
-static int COL_LAUNCHER_RESULT_FG	= YELLOW; 
-static int BORDER_WIDTH			= 1;
-static int MENU_POSITION		= CENTER;
+
+#define COL_SELECTED_BG 		YELLOW
+#define COL_SELECTED_FG 		BLACK
+#define COL_MENU_BG			GRAY
+#define WINDOW_GAP			10
+#define COL_MENU_DESKTOP_BG		GRAY
+#define COL_MENU_DESKTOP_FG		LGT_GRAY
+#define COL_MENU_DESKTOP_IND_POP	GREEN
+#define COL_MENU_DESKTOP_IND_EMPTY	MEDIUM_GRAY2
+#define COL_MENU_SETTINGS_BG		GRAY
+#define COL_MENU_SETTINGS_FG		LGT_GRAY
+#define COL_STATUS_BAR_BG		GRAY
+#define COL_STATUS_BAR_CLOCK		WHITE
+#define COL_STATUS_BAR_TITLE		YELLOW
+#define COL_STATUS_BAR_INFO		WHITE
+#define COL_STATUS_BAR_DESKTOP_FG	BLACK
+#define COL_STATUS_BAR_DESKTOP_BG	YELLOW
+#define COL_BORDER_SELECTED		YELLOW
+#define COL_BORDER			LGT_GRAY
+#define COL_LAUNCHER_BG                 GRAY
+#define COL_LAUNCHER_FG                 LGT_GRAY
+#define COL_LAUNCHER_RESULT_BG          MEDIUM_GRAY2
+#define COL_LAUNCHER_RESULT_SEL_BG	MEDIUM_GRAY
+#define COL_LAUNCHER_RESULT_FG          YELLOW 
+#define BORDER_WIDTH			1
+#define MENU_POSITION                   CENTER
 static int CIRCLE[2]			= {0, 360 * 64};
 
 static Atom NET_CLIENT_LIST;

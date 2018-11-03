@@ -193,7 +193,6 @@ int Desktop::findWindow(Window window, Window* arr, int size) {
 		if(arr[i] == window) {
 			found	= true;
 			index 	= i;
-			LOGGER_INFOF("Found at: %d", index);
 		}
 	}
 	return index;
@@ -374,7 +373,6 @@ Window Desktop::popCurrentWindow() {
 }
 
 bool Desktop::windowExists(Window window) {
-        LOGGER_DEBUG("CHECKING FOR WINDOW");
 	int index = findWindow(window, left, amountLeft);
 	if(index == -1) index = findWindow(window, right, amountRight);
 

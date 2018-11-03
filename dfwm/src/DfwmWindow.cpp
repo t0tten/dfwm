@@ -29,6 +29,7 @@
 #include "../include/logger.h"
 #include "../include/status_codes.h"
 #include "../include/DfwmStatus.h"
+#include "../include/Constants.h"
 
 DfwmWindow::DfwmWindow() {
 }
@@ -73,10 +74,6 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
                 return status;
         }
 
-        XSelectInput(this->display, this->window, EnterWindowMask | 
-                        FocusChangeMask | PropertyChangeMask |
-                        StructureNotifyMask);
-
         XRaiseWindow(this->display, this->window);
 
         XChangeProperty(this->display, this->root, XInternAtom(this->display, "_NET_CLIENT_LIST", False),
@@ -91,6 +88,11 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
 
         this->setClientState(NormalState);
         this->map();
+
+        /*XGrabButton(this->display, AnyButton, AnyModifier, this->window,
+                        False, BUTTONMASK, GrabModeAsync, GrabModeSync,
+                        None, None);
+                        */
 
         return DFWM_STATUS(DFWM_OK);
 }
