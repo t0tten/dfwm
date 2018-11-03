@@ -4,7 +4,8 @@
 #include "./Color.h"
 
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
-#define ROOT_EVENT_MASK         (SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask|PointerMotionMask)
+#define WINDOWS_EVENT_MASK	(EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask)
+#define ROOT_EVENT_MASK		(SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask|PointerMotionMask|EnterWindowMask|LeaveWindowMask|StructureNotifyMask|PropertyChangeMask)
 
 enum Alignment {CENTER, LEFT, RIGHT};
 enum LauncherState {SHOWING, HIDING};

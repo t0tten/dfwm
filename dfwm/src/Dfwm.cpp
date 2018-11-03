@@ -269,9 +269,11 @@ void Dfwm::handleXEvent() {
                         this->configureRequest(&e.xconfigurerequest);
                         break;
                 case EnterNotify:
+                        LOGGER_INFO("EnterNotify");
 			grabFocused(e.xcrossing.window, e.xcrossing.mode);
                         break;
                 case FocusIn:
+                        LOGGER_INFO("FocusIn");
                         grabFocused(e.xfocus.window, e.xfocus.mode);
                         break;
                 case MappingNotify:

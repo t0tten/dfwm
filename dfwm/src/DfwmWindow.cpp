@@ -88,7 +88,7 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
 
         this->setClientState(NormalState);
         this->map();
-
+	XSelectInput(display, window, WINDOWS_EVENT_MASK);
         /*XGrabButton(this->display, AnyButton, AnyModifier, this->window,
                         False, BUTTONMASK, GrabModeAsync, GrabModeSync,
                         None, None);
