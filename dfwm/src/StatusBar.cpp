@@ -21,7 +21,7 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 
 	/* Title */
 	this->title	= new StatusBarItem(clock->getWidth(), COL_STATUS_BAR_TITLE);
-	this->title->setText("Terminal");
+	//this->title->setText("Terminal");
 	
 	/* Infos */
 	this->nrOfInfos = 2;
