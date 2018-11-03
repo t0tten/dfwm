@@ -92,9 +92,6 @@ void Dfwm::init () {
 	XChangeWindowAttributes(disp, root, CWEventMask, &rootNewAttr);
 
 	XSelectInput(disp, root, ROOT_EVENT_MASK);
-        XSelectInput(disp, root, SubstructureRedirectMask|
-                        SubstructureNotifyMask|ButtonPressMask|
-                        PointerMotionMask);
 	
 	/* Find all open windows */
 	this->size 	= 20;
@@ -108,7 +105,6 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	//XSelectInput (disp, root, ROOT_EVENT_MASK); //| SubstructureRedirectMask);
 	XMapWindow (disp, root);
 	
 	/* Add windows to dfwm */
@@ -322,8 +318,6 @@ void Dfwm::configureRequest(XConfigureRequestEvent *ev) {
         bool shouldBeTiled = false;
         if(this->desktop[selected - 1]->windowExists(ev->window)) {
                 this->desktop[selected - 1]->resizeWindows();
-                //DfwmWindow win = DfwmWindow();
-                //DfwmStatus status = win.init(configuration, this->disp, ev->window, root);
 
                 return;
         } 
@@ -479,8 +473,6 @@ void Dfwm::drawGraphics(Window window) {
 
 void Dfwm::addWindowToDesktop(Window window) {
 	LOGGER_DEBUGF("addWindowToDesktop %lu", window);
-	//XWindowAttributes wndAttr;
-	//XGetWindowAttributes(disp, window, &wndAttr);
         
         Atom type;
         Atom* atoms;
@@ -491,7 +483,6 @@ void Dfwm::addWindowToDesktop(Window window) {
 
         if(len == 0) {
                 this->desktop[selected - 1]->addWindow(window);
-                //addMapped(window);
         }
 
 
@@ -499,7 +490,6 @@ void Dfwm::addWindowToDesktop(Window window) {
                 LOGGER_DEBUGF("addWinToDesk: %d:%s", i, XGetAtomName(disp, atoms[i]));
                 if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
                         this->desktop[selected - 1]->addWindow(window);
-                        //addMapped(window);
                 } 
         }
 
@@ -543,22 +533,20 @@ void Dfwm::grabFocused(Window window, int mode) {
 			unsigned long len, remain;
 			int form;
 
-			try {
-				LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
-				for(int i = 0; i < (int)len; i++) { 
-					LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
-					if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
-						char* name;
-						if(XFetchName(disp, window, &name)) {
-							std::string s_name = name;
-							this->bar->setText(s_name);
-						} else this->bar->setText("Window X");
-						this->bar->redraw();
-						this->desktop[selected - 1]->setCurrentFocusedWindow(window);
-					} 
-				}
-			} catch (char* e) {}
-		}
+                        LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
+                        for(int i = 0; i < (int)len; i++) { 
+                                LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
+                                if(atoms[i] == NET_WM_WINDOW_TYPE_NORMAL) {
+                                        char* name;
+                                        if(XFetchName(disp, window, &name)) {
+                                                std::string s_name = name;
+                                                this->bar->setText(s_name);
+                                        } else this->bar->setText("Window X");
+                                        this->bar->redraw();
+                                        this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+                                } 
+                        }
+                }
 	}
 	
 }

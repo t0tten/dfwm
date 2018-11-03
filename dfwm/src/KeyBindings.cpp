@@ -2,8 +2,6 @@
 #include "../include/logger.h"
 #include "../Config.h"
 
-#define CTRL 4
-
 KeyBindings::KeyBindings (Display* disp){ 
         this->disp = disp; 
 }
