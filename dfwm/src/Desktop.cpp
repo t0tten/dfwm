@@ -186,11 +186,9 @@ void Desktop::addWindow(Window window) {
 }
 
 int Desktop::findWindow(Window window, Window* arr, int size) {
-	LOGGER_DEBUG("int Desktop::findWindow(Window window, Window* arr, int size)");
 	bool found = false;
 	int index = -1;
 	for(int i = 0; i < size && !found; i++) {
-                LOGGER_DEBUGF("%lu", arr[i]);
 		if(arr[i] == window) {
 			found	= true;
 			index 	= i;
@@ -217,8 +215,8 @@ void Desktop::killCurrentWindow() {
 }
 
 bool Desktop::removeWindow(Window window) {
-	LOGGER_DEBUG("bool Desktop::removeWindow(Window window)");
 	LOGGER_DEBUGF("removeWindow: %lu", window);
+
 	if(window != 0) {
 		/* Search left side */
 		int index	= -1;
@@ -235,16 +233,13 @@ bool Desktop::removeWindow(Window window) {
 		if(index != -1) {
 			if(window == currFocus) currFocus = -1;
 			if(isLeft) {
-				LOGGER_DEBUG("Found in left column");
 				for(int i = index; i < (amountLeft - 1); i++) left[i] = left[i + 1];
 				amountLeft--;
 			} else {
-				LOGGER_DEBUG("Found in right column");
 				for(int i = index; i < (amountRight - 1); i++) right[i] = right[i + 1];
 				amountRight--;
 			}		
 					
-                        LOGGER_DEBUGF("amountLeft: %d amountRight: %d", amountRight, amountLeft);
 			if(amountLeft <= 0 && amountRight > 0) moveToLeft(right[0]);
 			resizeWindows();
 		}

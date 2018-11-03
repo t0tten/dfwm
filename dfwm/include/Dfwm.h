@@ -51,6 +51,8 @@ class Dfwm {
 		void removeWindowFromDesktop(Window);
                 void handleXEvent();
 
+                void propertyNotify(XPropertyEvent*);
+
 	public:
 		Dfwm();
 		Dfwm(std::string);

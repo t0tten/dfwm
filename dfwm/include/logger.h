@@ -6,7 +6,7 @@
 #ifdef DEBUG
         #define LOGGER_INFO(msg) syslog(LOG_INFO, "<%s:%s:%d> %s", __FILE__, __FUNCTION__, __LINE__, msg)
         #define LOGGER_INFOF(fmt, ...) syslog(LOG_INFO, fmt, __VA_ARGS__) 
-        #define LOGGER_DEBUG(msg) syslog(LOG_INFO, "<%s:%s:%d> %s", __FILE__, __FUNCTION__, __LINE__, msg)
+        #define LOGGER_DEBUG(msg) syslog(LOG_DEBUG, "<%s:%s:%d> %s", __FILE__, __FUNCTION__, __LINE__, msg)
         #define LOGGER_DEBUGF(fmt, ...) syslog(LOG_DEBUG, fmt, __VA_ARGS__)
 #else
         #define LOGGER_INFO

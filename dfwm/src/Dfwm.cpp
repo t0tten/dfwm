@@ -85,34 +85,12 @@ void Dfwm::init () {
 	XSetWindowAttributes rootNewAttr;
 	rootNewAttr.event_mask = ROOT_EVENT_MASK; 
 	XChangeWindowAttributes(disp, root, CWEventMask, &rootNewAttr);
-	XSelectInput(disp, root, rootNewAttr.event_mask);
-	std::cout << "Har" << std::endl;
+	//XSelectInput(disp, root, rootNewAttr.event_mask);
+        //
+        XSelectInput(disp, root, SubstructureRedirectMask|
+                        SubstructureNotifyMask|ButtonPressMask|
+                        PointerMotionMask);
 	
-	//initAtoms();
-
-	// --------------------------------------------------------
-	// DWM
-	
-	/* EWMH support per view */
-        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_CLIENT_LIST, 1);
-        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_WINDOW_TYPE, 1);
-        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_WINDOW_TYPE_NORMAL, 1);
-        //XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) NET_WM_STATE, 1);
-	//NET_CLIENT_LIST;
-	//NET_WM_WINDOW_TYPE;
-	//NET_WM_WINDOW_TYPE_NORMAL;
-	//NET_WM_STATE;
-
-        //XDeleteProperty(disp, root, NET_CLIENT_LIST);
-        /* select for events */
-        //wa.cursor = cursor[CurNormal]->cursor;
-        //wa.event_mask = SubstructureRedirectMask|SubstructureNotifyMask|ButtonPressMask|PointerMotionMask
-         //               |EnterWindowMask|LeaveWindowMask|StructureNotifyMask|PropertyChangeMask;
-        //XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
-        //XSelectInput(dpy, root, wa.event_mask);
-
-	// ---------------------------------------------------------
-
 	/* Find all open windows */
 	this->size 	= 20;
 	this->nrOfMapped= 0;
@@ -125,7 +103,7 @@ void Dfwm::init () {
 	XWindowAttributes rootAttr;
 	XGetWindowAttributes(disp, root, &rootAttr);
 
-	XSelectInput (disp, root, ROOT_EVENT_MASK); //| SubstructureRedirectMask);
+	//XSelectInput (disp, root, ROOT_EVENT_MASK); //| SubstructureRedirectMask);
 	XMapWindow (disp, root);
 	
 	/* Add windows to dfwm */
@@ -226,7 +204,7 @@ void Dfwm::removeMapped(Window window) {
 
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
-	std::cout << XGetAtomName(disp, xclient.message_type) << std::endl;
+
 	if(xclient.message_type == NET_WM_STATE) {
 		//addWindowToDesktop(xclient.window);
 	}
@@ -269,10 +247,11 @@ void Dfwm::handleXEvent() {
                         break;
                 case ConfigureRequest:
                         LOGGER_INFO("ConfigureRequest");
-			std::cout << "ConfigureRequest" << std::endl;
+
 			if(this->desktop[selected - 1]->windowExists(e.xconfigurerequest.window)) {
 				this->desktop[selected - 1]->resizeWindows();
 			} else {
+                                LOGGER_INFO("Unknown window");
 				XConfigureRequestEvent *ev = &e.xconfigurerequest;
 				XWindowChanges wc;
 
@@ -284,7 +263,11 @@ void Dfwm::handleXEvent() {
 		                wc.sibling = ev->above;
 		                wc.stack_mode = ev->detail;
 		                XConfigureWindow(disp, ev->window, ev->value_mask, &wc);
+
+                                checkWindow(ev->window);
 			}
+
+                        XSync(this->disp, False);
                         break;
                 case EnterNotify:
 			grabFocused(e.xcrossing.window, e.xcrossing.mode);
@@ -304,7 +287,8 @@ void Dfwm::handleXEvent() {
 			redraw();
                         break;
                 case PropertyNotify:
-                        //LOGGER_INFO("PropertyNotify");
+                        LOGGER_INFO("PropertyNotify");
+                        this->propertyNotify(&e.xproperty);
                         break;
                 case UnmapNotify: 
                         LOGGER_INFO("UnmapNotify");
@@ -312,6 +296,16 @@ void Dfwm::handleXEvent() {
 		//case MotionNotify:
 			//std::cout << "MotionNotify" << std::endl;
 			//break;
+        }
+}
+
+void Dfwm::propertyNotify(XPropertyEvent *ev) {
+	if ((ev->window == root) && (ev->atom == XA_WM_NAME)) {
+                LOGGER_INFO("root && XA_WM_NAME");
+        } else if(ev->state == PropertyDelete) {
+                LOGGER_INFO("PropertyDelete");
+        } else if(this->desktop[selected - 1]->windowExists(ev->window)) {
+                LOGGER_INFO("Window Exists");
         }
 }
 
