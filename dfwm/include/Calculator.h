@@ -43,9 +43,6 @@ class Calculator {
 
 void Calculator::printTree(Node* node) {
 	if (node != NULL) {
-		if(node->op == 'e') 	std::cout << node->num << std::endl;
-		else			std::cout << node->op << std::endl;
-	
 		if(node->left != NULL) 	printTree(node->left);
 		if(node->right != NULL)	printTree(node->right);
 	}
@@ -124,7 +121,6 @@ void Calculator::buildTree(std::string input) {
 		switch (input[i]) {
 			case '(':
 				{
-					//std::cout << "new tree" << std::endl;
 					Node* node = new Node(0, 'h', tree);
 					if (tree == NULL) {
 						tree = node;
@@ -143,7 +139,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case ')':
 				{
-					//std::cout << "find h" << std::endl;
 					if(tree->left != NULL && tree->op == 'h') {
 						Node* tmp = tree->left;
 
@@ -168,7 +163,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case '+':
 				{
-					//std::cout << "plus" << std::endl;
 					addNode(tree, '+', number);
 					number 		= "";
 					characters 	= "";
@@ -176,7 +170,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case '-':
 				{
-					//std::cout << "minus" << std::endl;
 					addNode(tree, '-', number);
 					number 		= "";
 					characters 	= "";
@@ -184,7 +177,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case '/':
 				{
-					//std::cout << "divide" << std::endl;
 					addNode(tree, '/', number);
 					number 		= "";
 					characters 	= "";
@@ -192,7 +184,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case '*':
 				{
-					//std::cout << "asterix" << std::endl;
 					addNode(tree, '*', number);
 					number 		= "";
 					characters 	= "";
@@ -200,7 +191,6 @@ void Calculator::buildTree(std::string input) {
 				break;
 			case '^':
 				{
-					//std::cout << "pow" << std::endl;
 					addNode(tree, '^', number);
 					number 		= "";
 					characters 	= "";
@@ -208,27 +198,22 @@ void Calculator::buildTree(std::string input) {
 				break;
 			default:
 				if(std::string("1234567890").find(input[i]) != std::string::npos) {
-					////std::cout << "num" << std::endl;
 					number += input[i];
 				} else if(std::string("abcdefghifklmnopqrstuvwxyz").find(input[i]) != -1) {
-					////std::cout << "character" << std::endl;
 					characters += input[i];
 				}
 
 				if (characters == "sqrt") {
-					//std::cout << "sqrt" << std::endl;	
 					characters = "";
 					throw "sqrt() not implemented yet";
 				}
 		}	
 	}
 
-	////std::cout << "treeOP: " << tree->op << std::endl;
 	if (root == NULL) throw "";
 	if (tree->op == 'h') throw ""; //Something went wrong
 	if(number == "") throw "";
 	tree->right = new Node(stod(number), 'e', tree);
-	////std::cout << "TreeRightNum: " << tree->right->num << std::endl;
 }
 
 #endif //_CALCULATOR_

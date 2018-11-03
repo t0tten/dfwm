@@ -168,37 +168,31 @@ void Desktop::swapFirstWindows() {
 
 void Desktop::addWindow(Window window, Window*& arr, int& size) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window, Window*& arr, int& size)");
-	expandArray(arr, size);
-	XSetWindowBorder(disp, window, COL_BORDER);
-	
-	XWindowChanges wChange;
-	wChange.border_width = BORDER_WIDTH;
-	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
 
-	arr[size] = window;
-	size++;
-        XSelectInput(disp, window, EVENT_MASK);
+        expandArray(arr, size);
+        arr[size] = window;
+        size++;
 }
 
 void Desktop::addWindow(Window window) {
 	LOGGER_DEBUG("void Desktop::addWindow(Window window)");
-	if(amountLeft <= 0) {
-	 	addWindow(window, left, amountLeft);
-		setCurrentFocusedWindow(window);
-	}else  			addWindow(window, right, amountRight);
-	resizeWindows();
+	if(findWindow(window, left, amountLeft) == -1 && findWindow(window, right, amountRight) == -1) {
+		if(amountLeft <= 0 && findWindow(window, left, amountLeft) == -1) {
+	 		addWindow(window, left, amountLeft);
+			setCurrentFocusedWindow(window);
+		} else	addWindow(window, right, amountRight);
+		resizeWindows();
+	}
 }
 
 int Desktop::findWindow(Window window, Window* arr, int size) {
-	LOGGER_DEBUG("int Desktop::findWindow(Window window, Window* arr, int size)");
 	bool found = false;
 	int index = -1;
+        int i;
 	for(int i = 0; i < size && !found; i++) {
-                LOGGER_DEBUGF("%lu", arr[i]);
 		if(arr[i] == window) {
 			found	= true;
 			index 	= i;
-			LOGGER_INFOF("Found at: %d", index);
 		}
 	}
 	return index;
@@ -206,10 +200,11 @@ int Desktop::findWindow(Window window, Window* arr, int size) {
 
 void Desktop::killCurrentWindow() {
 	LOGGER_DEBUG("void Desktop::killCurrentWindow()");
-	if(currFocus != -1) {
+
+	if(currFocus != -1 && this->windowExists(currFocus)) {
+                XGrabServer(this->disp);
+
 		LOGGER_DEBUG("TRYING TO KILL");
-		Atom DELETE 	= XInternAtom(disp, "WM_DELETE_WINDOW", False);
-		Atom PROTO 	= XInternAtom(disp, "WM_PROTOCOLS", True);	
 		
 		XEvent eKill;
 		eKill.xclient.type = ClientMessage;
@@ -220,14 +215,20 @@ void Desktop::killCurrentWindow() {
 		eKill.xclient.data.l[1] = CurrentTime;
 		XSendEvent(disp, currFocus, False, NoEventMask, &eKill);
 
-		//XDestroyWindow(disp, currFocus);
+                //XUnmapWindow(this->disp, currFocus);
+                //removeWindow(currFocus);
+
+                XSync(this->disp, False);
+                XUngrabServer(this->disp);
 	}
 }
 
 bool Desktop::removeWindow(Window window) {
-	LOGGER_DEBUG("bool Desktop::removeWindow(Window window)");
-	LOGGER_DEBUGF("removeWindow: %lu", window);
-	if(window != 0) {
+	LOGGER_DEBUGF("removeWindow: %lu, left=%d, right=%d", window, 
+                        amountLeft, amountRight);
+
+	if(window != 0 && window != *this->root && this->windowExists(window)) {
+
 		/* Search left side */
 		int index	= -1;
 		bool isLeft	= true;
@@ -243,19 +244,22 @@ bool Desktop::removeWindow(Window window) {
 		if(index != -1) {
 			if(window == currFocus) currFocus = -1;
 			if(isLeft) {
-				LOGGER_DEBUG("Found in left column");
 				for(int i = index; i < (amountLeft - 1); i++) left[i] = left[i + 1];
 				amountLeft--;
 			} else {
-				LOGGER_DEBUG("Found in right column");
 				for(int i = index; i < (amountRight - 1); i++) right[i] = right[i + 1];
 				amountRight--;
 			}		
 					
-                        LOGGER_DEBUGF("amountLeft: %d amountRight: %d", amountRight, amountLeft);
 			if(amountLeft <= 0 && amountRight > 0) moveToLeft(right[0]);
-			resizeWindows();
+
+                        if(amountLeft > 0) {
+                                resizeWindows();
+                        }
 		}
+
+	        LOGGER_DEBUGF("removed window: %lu, left=%d, right=%d", window, 
+                                amountLeft, amountRight);
 	}
 }
 
@@ -272,18 +276,32 @@ void Desktop::expandArray(Window*& arr, int amount) {
 }
 
 void Desktop::resizeWindows() {
-	LOGGER_DEBUG("void Desktop::resizeWindows()");
-        LOGGER_DEBUGF("amountLeft: %d amountRight: %d", amountRight, amountLeft);
+        LOGGER_INFO("resizing windows()");
 
 	/* Resize windows on the left side */
 	if(amountLeft > 0) {
-		LOGGER_DEBUG("Enter resize left");
 		int wX		= x + wgap;
 		int wY		= y + wgap;
 		int wWidth 	= (amountRight == 0) ? width - (2 * wgap) : (width / 2) - (2 * wgap); 
 		int wHeight	= (height - ((amountLeft + 1) * wgap) - y) / amountLeft;
 
 		for(int i = 0; i < amountLeft; i++) {
+			//--------
+			XConfigureEvent ce;
+
+                	ce.type = ConfigureNotify;
+               	 	ce.display = disp;
+               	 	ce.event = left[i];
+               	 	ce.window = left[i];
+               	 	ce.x = wX;
+               	 	ce.y = wY;
+               	 	ce.width = wWidth;
+               	 	ce.height = wHeight;
+               	 	ce.border_width = 1;
+               	 	ce.above = None;
+               	 	ce.override_redirect = False;
+               	 	XSendEvent(disp, left[i], False, StructureNotifyMask, (XEvent *)&ce);
+			//-------
 			XMoveResizeWindow(disp, left[i], wX, wY, wWidth, wHeight);
 			wY = wHeight + wgap + wY;
 		}	
@@ -291,13 +309,28 @@ void Desktop::resizeWindows() {
 
 	/* Resize windows on the right side */
 	if(amountRight > 0) {
-		LOGGER_DEBUG("Enter resize right");
 		int wX		= (width / 2);
 		int wY		= y + wgap;
 		int wWidth 	= (width / 2) - wgap; 
 		int wHeight	= (height - ((amountRight + 1) * wgap) - y) / amountRight;
 
 		for(int i = 0; i < amountRight; i++) {
+			//--------
+			XConfigureEvent ce;
+
+                	ce.type = ConfigureNotify;
+               	 	ce.display = disp;
+               	 	ce.event = right[i];
+               	 	ce.window = right[i];
+               	 	ce.x = wX;
+               	 	ce.y = wY;
+               	 	ce.width = wWidth;
+               	 	ce.height = wHeight;
+               	 	ce.border_width = 1;
+               	 	ce.above = None;
+               	 	ce.override_redirect = False;
+               	 	XSendEvent(disp, right[i], False, StructureNotifyMask, (XEvent *)&ce);
+			//-------
 			XMoveResizeWindow(disp, right[i], wX, wY, wWidth, wHeight);
 			wY = wHeight + wgap + wY;
 		}	
@@ -322,6 +355,7 @@ void Desktop::setCurrentFocusedWindow(Window window) {
 	XWindowChanges wChange;
 	wChange.border_width = BORDER_WIDTH;
 	XConfigureWindow(disp, window, CWBorderWidth, &wChange);
+	resizeWindows();
 }
 
 bool Desktop::gotWindows() {
@@ -337,3 +371,20 @@ Window Desktop::popCurrentWindow() {
 	removeWindow(wnd);
 	return wnd;
 }
+
+bool Desktop::windowExists(Window window) {
+	int index = findWindow(window, left, amountLeft);
+	if(index == -1) index = findWindow(window, right, amountRight);
+
+	if(index == -1) return false;
+	else		return true;
+}
+
+
+
+
+
+
+
+
+
