@@ -55,6 +55,7 @@ class Dfwm {
                 void propertyNotify(XPropertyEvent*);
                 void configureRequest(XConfigureRequestEvent*);
                 void unmapNotify(XUnmapEvent *ev);
+                void buttonPress(XButtonPressedEvent *ev);
 
 	public:
 		Dfwm();

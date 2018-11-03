@@ -30,6 +30,7 @@
 #include "../include/status_codes.h"
 #include "../include/DfwmStatus.h"
 #include "../include/Constants.h"
+#include "../include/dfwm_utils.h"
 
 DfwmWindow::DfwmWindow() {
 }
@@ -93,6 +94,8 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
                         False, BUTTONMASK, GrabModeAsync, GrabModeSync,
                         None, None);
                         */
+
+        dfwm::grabButtons(this->display, this->window);
 
         return DFWM_STATUS(DFWM_OK);
 }
