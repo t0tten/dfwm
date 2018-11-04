@@ -116,6 +116,23 @@ DfwmStatus DfwmWindow::getWindowAttributes() {
 
 DfwmStatus DfwmWindow::resize(int x, int y, int width, int height) {
         int ret;
+
+	//------
+	XConfigureEvent ce;
+
+	ce.type = ConfigureNotify;
+	ce.display = display;
+	ce.event = this->window;
+	ce.window = this->window;
+	ce.x = x;
+	ce.y = y;
+	ce.width = width;
+	ce.height = height;
+	ce.border_width = 1;
+	ce.above = None;
+	ce.override_redirect = False;
+	XSendEvent(display, this->window, False, StructureNotifyMask, (XEvent *)&ce);
+	//-----
         
         if((ret = XMoveResizeWindow(this->display, this->window, x,
                                         y, width, height)
