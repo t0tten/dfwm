@@ -216,9 +216,7 @@ void Dfwm::removeMapped(Window window) {
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
 
-	if(xclient.message_type == NET_WM_STATE) {
-		//addWindowToDesktop(xclient.window);
-	}
+	if(xclient.message_type == NET_WM_STATE) {}
 }
 
 void Dfwm::checkWindow(Window window) {
@@ -232,6 +230,17 @@ void Dfwm::checkWindow(Window window) {
                 LOGGER_DEBUG("FAILED TO INIT WINDOW");
         }
 	
+}
+
+void Dfwm::destroyNotify(XDestroyWindowEvent &dwe) {
+	LOGGER_INFO("DestroyNotify");
+	XUnmapWindow(this->disp, dwe.window);
+
+	if(this->desktop[selected - 1]->windowExists(dwe.window)) {
+		removeWindowFromDesktop(dwe.window);
+		updateTitleText();
+	}
+	XSync(this->disp, False);
 }
 
 void Dfwm::handleXEvent() {
@@ -256,19 +265,10 @@ void Dfwm::handleXEvent() {
                         translateClientMessage(e.xclient);
                         break;
                 case DestroyNotify:
-                        XUnmapWindow(this->disp, e.xdestroywindow.window);
-
-                        if(this->desktop[selected - 1]->windowExists(e.xdestroywindow.window)) {
-                                removeWindowFromDesktop(e.xdestroywindow.window);
-				if(this->desktop[selected - 1]->getCurrentFocusedWindow() == -1) {
-					this->bar->setText("");
-				}
-                        }
-                        XSync(this->disp, False);
+			destroyNotify(e.xdestroywindow);
                         break;
                 case ConfigureRequest:
                         LOGGER_INFO("ConfigureRequest");
-
                         this->configureRequest(&e.xconfigurerequest);
                         break;
                 case EnterNotify:
@@ -300,6 +300,19 @@ void Dfwm::handleXEvent() {
                         XSync(this->disp, False);
                         break;
         }
+}
+
+void Dfwm::updateTitleText() {
+	Window window = this->desktop[selected - 1]->getCurrentFocusedWindow();
+	if(window == -1) {
+		this->bar->setText("");
+	} else {
+		char* name;
+		if(XFetchName(disp, window, &name)) {
+                	std::string s_name = name;
+                	this->bar->setText(s_name);
+		} else this->bar->setText("Damn fine window"); 
+	}
 }
 
 void Dfwm::unmapNotify(XUnmapEvent *ev) {
@@ -448,6 +461,7 @@ void Dfwm::setSelected(int selected) {
 		this->selected = selected; 
 		if(this->selected > maxDesktops) this->selected = maxDesktops;
 		this->desktop[this->selected - 1]->show();
+		updateTitleText();
 	}
 }
 
