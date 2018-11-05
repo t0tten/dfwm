@@ -6,10 +6,10 @@ ODIR	= src/obj
 IDIR	= include
 SDIR	= src
 
-_DEPS	= Dfwm.h KeyBindings.h StatusBar.h Color.h Constants.h StatusBarItem.h StatusBarItemDesktop.h StatusBarClock.h StatusBarItemInfo.h Menu.h Desktop.h Launcher.h DfwmWindow.h Configuration.h DfwmStatus.h
+_DEPS	= Dfwm.h KeyBindings.h StatusBar.h Color.h Constants.h StatusBarItem.h StatusBarItemDesktop.h StatusBarClock.h StatusBarItemInfo.h Menu.h Desktop.h Launcher.h DfwmWindow.h Configuration.h DfwmStatus.h dfwm_utils.h
 DEPS	= $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ	= Main.o Dfwm.o KeyBindings.o StatusBar.o StatusBarItem.o StatusBarItemDesktop.o StatusBarClock.o StatusBarItemInfo.o Menu.o Desktop.o Launcher.o DfwmWindow.o Configuration.o DfwmStatus.o
+_OBJ	= Main.o Dfwm.o KeyBindings.o StatusBar.o StatusBarItem.o StatusBarItemDesktop.o StatusBarClock.o StatusBarItemInfo.o Menu.o Desktop.o Launcher.o DfwmWindow.o Configuration.o DfwmStatus.o dfwm_utils.o
 OBJ	= $(patsubst %,$(SDIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)

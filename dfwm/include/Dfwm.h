@@ -56,6 +56,8 @@ class Dfwm {
                 void propertyNotify(XPropertyEvent*);
                 void configureRequest(XConfigureRequestEvent*);
                 void unmapNotify(XUnmapEvent *ev);
+                void buttonPress(XButtonPressedEvent *ev);
+                void refocus(Window window);
 		void destroyNotify(XDestroyWindowEvent&);
 
 	public:

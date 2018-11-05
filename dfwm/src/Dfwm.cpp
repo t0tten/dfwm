@@ -1,6 +1,7 @@
 #include "../include/Dfwm.h"
 #include "../include/logger.h"
 #include "../include/DfwmWindow.h"
+#include "../include/dfwm_utils.h"
 
 Dfwm::Dfwm () {
 	disp = XOpenDisplay(NULL);
@@ -232,6 +233,20 @@ void Dfwm::checkWindow(Window window) {
 	
 }
 
+void Dfwm::buttonPress(XButtonPressedEvent *ev) {
+                this->refocus(ev->window);
+}
+
+void Dfwm::refocus(Window window) {
+        Window oldFocus = this->desktop[selected - 1]->getCurrentFocusedWindow();
+        if(oldFocus != -1) {
+                dfwm::unfocus(this->disp, this->root, oldFocus);
+        }
+        
+        dfwm::focus(this->disp, this->root, window);
+        this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+}
+
 void Dfwm::destroyNotify(XDestroyWindowEvent &dwe) {
 	LOGGER_INFO("DestroyNotify");
 	XUnmapWindow(this->disp, dwe.window);
@@ -250,6 +265,7 @@ void Dfwm::handleXEvent() {
                         break;
                 case ButtonPress:
                         LOGGER_INFO("ButtonPress");
+                        this->buttonPress(&e.xbutton);
                         break;
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
@@ -273,11 +289,11 @@ void Dfwm::handleXEvent() {
                         break;
                 case EnterNotify:
                         LOGGER_INFO("EnterNotify");
-			grabFocused(e.xcrossing.window, e.xcrossing.mode);
+			//grabFocused(e.xcrossing.window, e.xcrossing.mode);
                         break;
                 case FocusIn:
                         LOGGER_INFO("FocusIn");
-                        grabFocused(e.xfocus.window, e.xfocus.mode);
+                        //grabFocused(e.xfocus.window, e.xfocus.mode);
                         break;
                 case MappingNotify:
 			LOGGER_INFO("MappingNotify");
@@ -374,8 +390,7 @@ void Dfwm::configureRequest(XConfigureRequestEvent *ev) {
                 addMapped(ev->window);
         }
 
-
-
+        this->refocus(ev->window);
         XSync(this->disp, False);
 }
 
