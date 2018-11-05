@@ -15,6 +15,7 @@
 
 ### Statusbar
 * Clickable infos
+* Scroll through desktops when scrolling on statusbar
 
 ### Menu
 
@@ -26,6 +27,7 @@
 :100:
 
 ### General
+* Implemented custom focus
 
 ### Desktop
 * Change focus when mouse is moved
