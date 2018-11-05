@@ -154,7 +154,7 @@ void Dfwm::initAtoms() {
 	WM_DELETE_WINDOW   		= XInternAtom(disp, "WM_DELETE_WINDOW", False);
 	WM_PROTOCOLS			= XInternAtom(disp, "WM_PROTOCOLS", False);
 	WM_TAKE_FOCUS			= XInternAtom(disp, "WM_TAKE_FOCUS", False);
-	WM_STATE			= XInternAtom(disp, "NET_STATE", False);
+	WM_STATE			= XInternAtom(disp, "WM_STATE", False);
 
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_CLIENT_LIST, 1);
         XChangeProperty(disp, root, NET_SUPPORTED, XA_ATOM, 32, PropModeReplace, (unsigned char *) &NET_WM_WINDOW_TYPE_NORMAL, 1);
@@ -221,6 +221,18 @@ void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 }
 
 void Dfwm::checkWindow(Window window) {
+	/*int format;
+        long result = -1;
+        unsigned char *p = NULL;
+        unsigned long n, extra;
+        Atom real;
+	std::cout << "WM_STATE: " << std::endl;
+	if(XGetWindowProperty(disp, window, WM_STATE, 0L, 2L, False, WM_STATE, &real, &format, &n, &extra, (unsigned char **)&p) == Success) {
+		std::cout << "n: " << n << std::endl;
+		if(n != 0) result = *p;
+	}
+	std::cout << "Result: " << result << std::endl;
+	std::cout << "IconicState: " << IconicState << std::endl;*/
 
         DfwmWindow win = DfwmWindow();
         DfwmStatus status = win.init(configuration, this->disp, window, root);

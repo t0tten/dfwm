@@ -83,7 +83,7 @@ void dfwm::ungrabButtons(Display *display, Window window) {
 }
 
 void dfwm::focus(Display *display, Window root, Window window) {
-        ungrabButtons(display, window);
+        //ungrabButtons(display, window);
 
         XSetInputFocus(display, window, RevertToPointerRoot, CurrentTime);
         XChangeProperty(display, root, NET_ACTIVE_WINDOW, XA_WINDOW, 32,
@@ -92,7 +92,7 @@ void dfwm::focus(Display *display, Window root, Window window) {
 }
 
 void dfwm::unfocus(Display *display, Window root, Window window) {
-        grabButtons(display, window);
+        //grabButtons(display, window);
         XSetInputFocus(display, root, RevertToPointerRoot, CurrentTime);
         XDeleteProperty(display, root, NET_ACTIVE_WINDOW);
 }
