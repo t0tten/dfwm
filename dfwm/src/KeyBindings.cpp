@@ -2,8 +2,6 @@
 #include "../include/logger.h"
 #include "../Config.h"
 
-#define CTRL 4
-
 KeyBindings::KeyBindings (Display* disp){ 
         this->disp = disp; 
 }
@@ -121,6 +119,57 @@ void KeyBindings::executeAction(Dfwm* dfwm, int action) {
                 case ACTION_PREV_DESKTOP:
                         changeDesktop(dfwm, false);
                         break;
+                case ACTION_MOVE_WND_LEFT:
+			dfwm->getCurrentDesktop()->moveFirstWndToLeft();
+                        break;
+                case ACTION_MOVE_WND_RGHT:
+			dfwm->getCurrentDesktop()->moveLastWndToRight();
+                        break;
+                case ACTION_MOVE_CUR_WND_LEFT:
+			dfwm->getCurrentDesktop()->moveCurrWndToLeft();
+                        break;
+                case ACTION_MOVE_CUR_WND_RGHT:
+			dfwm->getCurrentDesktop()->moveCurrWndToRight();
+                        break;
+                case ACTION_MOVE_CUR_WND_UP:
+			dfwm->getCurrentDesktop()->moveCurrWndUpByOne();
+                        break;
+                case ACTION_MOVE_CUR_WND_DOWN:
+			dfwm->getCurrentDesktop()->moveCurrWndDownByOne();
+                        break;
+                case ACTION_SWAP_FIRST_WNDS:
+			dfwm->getCurrentDesktop()->swapFirstWindows();
+                        break;
+                case ACTION_WV_WND_DESKTOP_1:
+			dfwm->moveCurrentWindowToDesktop(1);
+			break;
+                case ACTION_MV_WND_DESKTOP_2:
+			dfwm->moveCurrentWindowToDesktop(2);
+			break;
+                case ACTION_MV_WND_DESKTOP_3:
+			dfwm->moveCurrentWindowToDesktop(3);
+			break;
+                case ACTION_MV_WND_DESKTOP_4:
+			dfwm->moveCurrentWindowToDesktop(4);
+			break;
+                case ACTION_MV_WND_DESKTOP_5:
+			dfwm->moveCurrentWindowToDesktop(5);
+			break;
+                case ACTION_MV_WND_DESKTOP_6:
+			dfwm->moveCurrentWindowToDesktop(6);
+			break;
+                case ACTION_MV_WND_DESKTOP_7:
+			dfwm->moveCurrentWindowToDesktop(7);
+			break;
+                case ACTION_MV_WND_DESKTOP_8:
+			dfwm->moveCurrentWindowToDesktop(8);
+			break;
+                case ACTION_MV_WND_DESKTOP_9:
+			dfwm->moveCurrentWindowToDesktop(9);
+			break;
+                case ACTION_MV_WND_DESKTOP_0:
+			dfwm->moveCurrentWindowToDesktop(0);
+			break;
                 case ACTION_QUIT_WM:
                         dfwm->quit();
                         break;
@@ -145,8 +194,9 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 	if(dfwm->getLauncher()->getState() == HIDING) {
                 this->executeAction(dfwm, action);
 	} else if(dfwm->getLauncher()->getState() == SHOWING) {
-		if(key == XK_Escape)		dfwm->getLauncher()->hide();
-		else if(key == XK_Return) {
+		if(key == XK_Escape) {
+                        dfwm->getLauncher()->hide();
+                } else if(key == XK_Return) {
 			dfwm->getCurrentDesktop()->openProgram(dfwm->getLauncher()->getText());
 			dfwm->getLauncher()->hide();
 		} else if(key == XK_BackSpace) {
@@ -180,7 +230,7 @@ void KeyBindings::translate_KeyDown (Dfwm* dfwm, XKeyEvent* keyCode) {
 }
 
 void KeyBindings::translate_KeyUp (Dfwm* dfwm, XKeyEvent* keyCode) {
-        if (this->getAction(keyCode)) {
+        if (this->getAction(keyCode) == ACTION_HIDE_MENU) {
                 dfwm->getMenu()->hide();
         }
 }

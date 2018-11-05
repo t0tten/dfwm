@@ -7,40 +7,50 @@
 * Get FONT metrics
 
 ### Desktop
-* Move windows between screens
 * Minimize functionality?
-* Swap main screen with focused on left side
-* Move windows to other array
+
 
 ### Launcher
-* Launcher should get focus when opened
 * Launcher should close when it loose focus
 
 ### Statusbar
 * Clickable infos
-* Get current time/date
+* Scroll through desktops when scrolling on statusbar
 
 ### Menu
-* A bit off - not really in the middle
-* Some sort of color indication that a desktop has windows
 
 ### Config
 * Read configurations from file
 
 ## Previous fixes:
 
+:100:
+
 ### General
+* Implemented custom focus
 
 ### Desktop
-* Change focus when mouse is moved?
+* Change focus when mouse is moved
+* Move first window on right to last on left side (alt+j)
+* Move last on left side to first on right side (alt+k)
+* Move current focused window to other side (alt+h - left; alt+l - right)
+* Move current focused window up by one (alt+u)
+* Move current focused window down by one (alt+n)
+* Swap first window on left with first window on right (alt+s)
+* Move windows between screens
 
 ### Launcher
 * Search through programs
 * Autocomplete
+* Launcher should get focus when opened
 
 ### Statusbar
+* Get current time/date
+* Title updates on window change
 
 ### Menu
+* A bit off - not really in the middle
+* Color indication that a desktop has windows
 
 ### Keybindings
 * Keyboard not registered when NUMLOCK is off

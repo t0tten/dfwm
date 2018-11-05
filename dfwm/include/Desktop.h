@@ -31,7 +31,7 @@ class Desktop {
 		int findWindow(Window, Window*, int);
 
 		void expandArray(Window*&, int amount);
-		void resizeWindows();
+		//void resizeWindows();
 		void addWindow(Window, Window*&, int&);
 
 	public:
@@ -45,12 +45,26 @@ class Desktop {
 
 		void moveToLeft(Window);
 		void moveToRight(Window);
+		
+		void moveFirstWndToLeft();
+		void moveLastWndToRight();
+		void moveCurrWndToLeft();
+		void moveCurrWndToRight();
+		void moveCurrWndUpByOne();
+		void moveCurrWndDownByOne();
+		void swapFirstWindows();
 
 		void addWindow(Window);
 		void killCurrentWindow();
 		bool removeWindow(Window);
 		void openProgram(std::string);
 		void setCurrentFocusedWindow(Window);
+		bool gotWindows();
+		Window popCurrentWindow();
+                
+                Window getCurrentFocusedWindow();
+		void resizeWindows();
+		bool windowExists(Window);
 };
 
 #endif //_DESKTOP_

@@ -8,6 +8,7 @@
 #include "./Menu.h"
 #include "./Desktop.h"
 #include "./Launcher.h"
+#include "./Configuration.h"
 
 #include <iostream>
 #include <string>
@@ -26,6 +27,7 @@ class Dfwm {
 		Menu* menu;
 		Desktop** desktop;
 		Launcher* launcher;
+                Configuration* configuration;
 		
 		int size;
 		int nrOfMapped;
@@ -37,15 +39,27 @@ class Dfwm {
 		int maxDesktops;
 		KeyCode code;
 		bool running;
+		bool* desktopHaveWindow;
 		
 		void init();
+		void initAtoms();
 		Window* findAllWindows(unsigned int&);
-		bool isMapped(Window);
 		bool windowIsNotDfwm(Window);
 		void drawGraphics(Window);
 		void addWindowToDesktop(Window);
 		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
+		void updateTitleText();
+
+                /* X11 Events */
+                void handleXEvent();
+                void propertyNotify(XPropertyEvent*);
+                void configureRequest(XConfigureRequestEvent*);
+                void unmapNotify(XUnmapEvent *ev);
+                void buttonPress(XButtonPressedEvent *ev);
+                void refocus(Window window);
+		void destroyNotify(XDestroyWindowEvent&);
+		void enterNotify(XCrossingEvent&);
 
 	public:
 		Dfwm();
@@ -69,6 +83,8 @@ class Dfwm {
 		Window* getMappedList();
 		int getNrOfMapped();
 		void grabFocused(Window, int);
+		void checkWindow(Window);
+		void moveCurrentWindowToDesktop(int);
 
                 Display* getDisplay();
                 Window getRoot();

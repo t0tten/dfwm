@@ -17,18 +17,19 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 	this->dtop	= new StatusBarItemDesktop(10, COL_STATUS_BAR_DESKTOP_FG);
 
 	/* Clock */
-	this->clk 	= new StatusBarClk(dtop->getWidth(), COL_STATUS_BAR_CLK);
+	this->clock 	= new StatusBarClock(dtop->getWidth(), COL_STATUS_BAR_CLOCK);
 
 	/* Title */
-	this->title	= new StatusBarItem(clk->getWidth(), COL_STATUS_BAR_TITLE);
-	this->title->setText("Terminal");
+	this->title	= new StatusBarItem(clock->getWidth(), COL_STATUS_BAR_TITLE);
+	//this->title->setText("Terminal");
 	
 	/* Infos */
 	this->nrOfInfos = 2;
 	this->infos 	= new StatusBarItemInfo*[nrOfInfos];
-	this->infos[0] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO);
+	this->infos[0] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, parentAttr);
 	this->infos[0]->setText("V: 100%");
-	this->infos[1] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, infos[0]->getX());
+	this->infos[1] 	= new StatusBarItemInfo(COL_STATUS_BAR_INFO, parentAttr, 
+                        infos[0]->getX());
 	this->infos[1]->setText("B: 100%");
 
 	this->show();
@@ -36,7 +37,7 @@ StatusBar::StatusBar (Display* disp, Window* parent, int* selected) {
 }
 
 StatusBar::~StatusBar () {
-	delete this->clk;
+	delete this->clock;
 	delete this->title;
 	for(int i = 0; i < nrOfInfos; i++) {
 		delete infos[i];
@@ -54,7 +55,7 @@ void StatusBar::draw() {
 	XFillRectangle(disp, bar, gc, x, y, width, height);
 
 	this->dtop->draw(disp, &bar, &gc, selected);
-	this->clk->draw(disp, &bar, &gc);
+	this->clock->draw(disp, &bar, &gc);
 	this->title->draw(disp, &bar, &gc);
 	for(int i = 0; i < nrOfInfos; i++) {
 		this->infos[i]->draw(disp, &bar, &gc);	
@@ -64,6 +65,8 @@ void StatusBar::draw() {
 int StatusBar::getWindowID() { return bar; }
 
 void StatusBar::redraw() {
+        this->update();
+
 	XEvent exp;
 	exp.type 		= Expose;
 	exp.xexpose.window 	= bar;
@@ -72,3 +75,8 @@ void StatusBar::redraw() {
 
 int StatusBar::getHeight() { return this->height; }
 void StatusBar::setText(std::string text) { this->title->setText(text); }
+
+void StatusBar::update() {
+        this->clock->update();
+}
+

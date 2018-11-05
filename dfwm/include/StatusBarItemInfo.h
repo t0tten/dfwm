@@ -5,8 +5,11 @@
 
 class StatusBarItemInfo : public StatusBarItem {
 	private:
+                XWindowAttributes xWindowAttributes; 
+
 	public:
-		StatusBarItemInfo(int color, int x = 0);
+		StatusBarItemInfo(int color, XWindowAttributes winAttrs,
+                                int x = 0);
 		~StatusBarItemInfo();
 
 		void setText(std::string text);

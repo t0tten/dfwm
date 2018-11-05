@@ -1,4 +1,5 @@
 #include "../include/Launcher.h"
+#include "../include/Calculator.h"
 
 Launcher::Launcher (Display* disp, Window* parent) {
 	this->disp 	= disp;
@@ -29,6 +30,14 @@ void Launcher::show() {
 	XRaiseWindow(disp, launcher);
 	this->draw();
 	this->getPaths();
+
+	Window focWin;
+	int revert;
+	XGetInputFocus(disp, &focWin, &revert);
+
+	XSync(this->disp, false);
+	XSetInputFocus(disp, launcher, RevertToPointerRoot, CurrentTime);
+	XSelectInput(disp, launcher, KeyPressMask);
 }
 
 void Launcher::hide() {
@@ -38,6 +47,8 @@ void Launcher::hide() {
 	this->autoCorrectIndex = -1;
 	this->setState(HIDING);
 	XUnmapWindow(disp, launcher);
+
+	XSelectInput(disp, launcher, 0);
 }
 
 void Launcher::draw() {
@@ -138,8 +149,13 @@ void Launcher::search() {
 	if(searchPhrase.length() != 0) {
 		for(int i = 0; i < files.size(); i++) {
 			if (files.at(i).find(searchPhrase) != std::string::npos) {
-			this->results.push_back(files.at(i));
+				this->results.push_back(files.at(i));
 			}
+			if(results.size() == 0) {
+				std::string result = Calculator::calculate(searchPhrase);
+				if(result != "") results.push_back(result);
+	                }
+
 		}
 	}
 }
