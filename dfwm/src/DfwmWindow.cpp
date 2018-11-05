@@ -75,7 +75,7 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
                 return status;
         }
 
-        XRaiseWindow(this->display, this->window);
+        //XRaiseWindow(this->display, this->window);
 
         XChangeProperty(this->display, this->root, XInternAtom(this->display, "_NET_CLIENT_LIST", False),
                         XA_WINDOW, 32, PropModeAppend, (unsigned char*) 
@@ -95,7 +95,7 @@ DfwmStatus DfwmWindow::init(Configuration* configuration,
                         None, None);
                         */
 
-        dfwm::grabButtons(this->display, this->window);
+        //dfwm::grabButtons(this->display, this->window);
 
         return DFWM_STATUS(DFWM_OK);
 }

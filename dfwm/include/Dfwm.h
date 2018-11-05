@@ -59,6 +59,7 @@ class Dfwm {
                 void buttonPress(XButtonPressedEvent *ev);
                 void refocus(Window window);
 		void destroyNotify(XDestroyWindowEvent&);
+		void enterNotify(XCrossingEvent&);
 
 	public:
 		Dfwm();

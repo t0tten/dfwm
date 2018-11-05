@@ -234,7 +234,12 @@ void Dfwm::checkWindow(Window window) {
 }
 
 void Dfwm::buttonPress(XButtonPressedEvent *ev) {
-                this->refocus(ev->window);
+	this->refocus(ev->window);
+	//Städa pekare?
+}
+
+void Dfwm::enterNotify(XCrossingEvent& ce) {
+	if(ce.window != root) this->refocus(ce.window);
 }
 
 void Dfwm::refocus(Window window) {
@@ -245,6 +250,7 @@ void Dfwm::refocus(Window window) {
         
         dfwm::focus(this->disp, this->root, window);
         this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+	this->updateTitleText();
 }
 
 void Dfwm::destroyNotify(XDestroyWindowEvent &dwe) {
@@ -265,7 +271,7 @@ void Dfwm::handleXEvent() {
                         break;
                 case ButtonPress:
                         LOGGER_INFO("ButtonPress");
-                        this->buttonPress(&e.xbutton);
+                        //this->buttonPress(&e.xbutton);
                         break;
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
@@ -290,6 +296,7 @@ void Dfwm::handleXEvent() {
                 case EnterNotify:
                         LOGGER_INFO("EnterNotify");
 			//grabFocused(e.xcrossing.window, e.xcrossing.mode);
+			this->enterNotify(e.xcrossing);
                         break;
                 case FocusIn:
                         LOGGER_INFO("FocusIn");
@@ -476,8 +483,8 @@ void Dfwm::setSelected(int selected) {
 		this->selected = selected; 
 		if(this->selected > maxDesktops) this->selected = maxDesktops;
 		this->desktop[this->selected - 1]->show();
-		updateTitleText();
 	}
+	updateTitleText();
 }
 
 void Dfwm::incrementSelected() {
