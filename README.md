@@ -1,21 +1,21 @@
 # Damn Fine Window Manager
 
-Key bindings:
-Swap main window with first in second array - Meta+S
-Move focused window to right array - Meta+L
-Move focused window to left arrat - Meta+H
-Move first window in right array to the last in the left array - Meta+J
-Move last window in left array to the first in the right array - Meta+K
-Move focused window up in the array - Meta+U
-Move focused window down in the array - Meta+N
-Open launcher - Meta+Return
-Close launcher - ESC
-Menu - Meta
-Exit dfwm - Meta+ESC
-Close window - Meta+Q
-Change desktop - Meta+{1-9}
-Move window to other desktop - Ctrl+Meta+{1-9}
-Open terminal - Ctrl+Meta+T
+###Key bindings:
+* Swap main window with first in second array - Meta+S
+* Move focused window to right array - Meta+L
+* Move focused window to left arrat - Meta+H
+* Move first window in right array to the last in the left array - Meta+J
+* Move last window in left array to the first in the right array - Meta+K
+* Move focused window up in the array - Meta+U
+* Move focused window down in the array - Meta+N
+* Open launcher - Meta+Return
+* Close launcher - ESC
+* Menu - Meta
+* Exit dfwm - Meta+ESC
+* Close window - Meta+Q
+* Change desktop - Meta+{1-9}
+* Move window to other desktop - Ctrl+Meta+{1-9}
+* Open terminal - Ctrl+Meta+T
 
 ## TODO:
 ### General
