@@ -1,6 +1,6 @@
 # Damn Fine Window Manager
 
-###Key bindings:
+Key bindings:
 * Swap main window with first in second array - Meta+S
 * Move focused window to right array - Meta+L
 * Move focused window to left arrat - Meta+H
