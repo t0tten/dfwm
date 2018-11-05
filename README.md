@@ -44,6 +44,7 @@
 
 ### Statusbar
 * Get current time/date
+* Title updates on window change
 
 ### Menu
 * A bit off - not really in the middle

@@ -49,6 +49,7 @@ class Dfwm {
 		void addWindowToDesktop(Window);
 		void translateClientMessage(XClientMessageEvent);
 		void removeWindowFromDesktop(Window);
+		void updateTitleText();
 
                 /* X11 Events */
                 void handleXEvent();
@@ -56,8 +57,8 @@ class Dfwm {
                 void configureRequest(XConfigureRequestEvent*);
                 void unmapNotify(XUnmapEvent *ev);
                 void buttonPress(XButtonPressedEvent *ev);
-
                 void refocus(Window window);
+		void destroyNotify(XDestroyWindowEvent&);
 
 	public:
 		Dfwm();

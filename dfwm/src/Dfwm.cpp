@@ -217,9 +217,7 @@ void Dfwm::removeMapped(Window window) {
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
 	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
 
-	if(xclient.message_type == NET_WM_STATE) {
-		//addWindowToDesktop(xclient.window);
-	}
+	if(xclient.message_type == NET_WM_STATE) {}
 }
 
 void Dfwm::checkWindow(Window window) {
@@ -247,7 +245,17 @@ void Dfwm::refocus(Window window) {
         
         dfwm::focus(this->disp, this->root, window);
         this->desktop[selected - 1]->setCurrentFocusedWindow(window);
+}
 
+void Dfwm::destroyNotify(XDestroyWindowEvent &dwe) {
+	LOGGER_INFO("DestroyNotify");
+	XUnmapWindow(this->disp, dwe.window);
+
+	if(this->desktop[selected - 1]->windowExists(dwe.window)) {
+		removeWindowFromDesktop(dwe.window);
+		updateTitleText();
+	}
+	XSync(this->disp, False);
 }
 
 void Dfwm::handleXEvent() {
@@ -273,16 +281,10 @@ void Dfwm::handleXEvent() {
                         translateClientMessage(e.xclient);
                         break;
                 case DestroyNotify:
-                        XUnmapWindow(this->disp, e.xdestroywindow.window);
-
-                        if(this->desktop[selected - 1]->windowExists(e.xdestroywindow.window)) {
-                                removeWindowFromDesktop(e.xdestroywindow.window);
-                        }
-                        XSync(this->disp, False);
+			destroyNotify(e.xdestroywindow);
                         break;
                 case ConfigureRequest:
                         LOGGER_INFO("ConfigureRequest");
-
                         this->configureRequest(&e.xconfigurerequest);
                         break;
                 case EnterNotify:
@@ -314,6 +316,19 @@ void Dfwm::handleXEvent() {
                         XSync(this->disp, False);
                         break;
         }
+}
+
+void Dfwm::updateTitleText() {
+	Window window = this->desktop[selected - 1]->getCurrentFocusedWindow();
+	if(window == -1) {
+		this->bar->setText("");
+	} else {
+		char* name;
+		if(XFetchName(disp, window, &name)) {
+                	std::string s_name = name;
+                	this->bar->setText(s_name);
+		} else this->bar->setText("Damn fine window"); 
+	}
 }
 
 void Dfwm::unmapNotify(XUnmapEvent *ev) {
@@ -376,7 +391,6 @@ void Dfwm::configureRequest(XConfigureRequestEvent *ev) {
         }
 
         this->refocus(ev->window);
-
         XSync(this->disp, False);
 }
 
@@ -410,7 +424,16 @@ void Dfwm::propertyNotify(XPropertyEvent *ev) {
                 if(ev->atom == XInternAtom(this->disp, "_NET_WM_WINDOW_TYPE", False)) {
                         LOGGER_INFO("WINDOW TYPE");
                 }
-        }
+
+		if(ev->window == this->desktop[selected - 1]->getCurrentFocusedWindow()) {
+			char* name;
+                	if(XFetchName(disp, ev->window, &name)) {
+                        	std::string s_name = name;
+				this->bar->setText(s_name);
+			} else this->bar->setText("Damn fine window");
+		}
+
+	} 
 }
 
 void Dfwm::run () {
@@ -453,6 +476,7 @@ void Dfwm::setSelected(int selected) {
 		this->selected = selected; 
 		if(this->selected > maxDesktops) this->selected = maxDesktops;
 		this->desktop[this->selected - 1]->show();
+		updateTitleText();
 	}
 }
 
@@ -562,7 +586,7 @@ void Dfwm::grabFocused(Window window, int mode) {
                                         if(XFetchName(disp, window, &name)) {
                                                 std::string s_name = name;
                                                 this->bar->setText(s_name);
-                                        } else this->bar->setText("Window X");
+                                        } else this->bar->setText("Damn fine window");
                                         this->bar->redraw();
                                         this->desktop[selected - 1]->setCurrentFocusedWindow(window);
                                 } 
