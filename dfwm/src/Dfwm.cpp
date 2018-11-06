@@ -253,6 +253,9 @@ void Dfwm::buttonPressed(XButtonEvent& be) {
 	if(be.y > 0 && be.y < 25) {
 		if(be.button == 4)		this->incrementSelected();
 		else if (be.button == 5) 	this->decrementSelected();
+		
+		/* Check every info */
+		this->bar->checkClick(be.x, be.y);
 	}
 }
 

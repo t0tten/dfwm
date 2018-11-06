@@ -80,3 +80,8 @@ void StatusBar::update() {
         this->clock->update();
 }
 
+void StatusBar::checkClick(int x, int y) {
+	for(int i = 0; i < nrOfInfos; i++) {
+		this->infos[i]->checkClick(x, y);	
+	}
+}

@@ -2,6 +2,7 @@
 #define _STATUS_BAR_ITEM_INFO_
 
 #include "./StatusBarItem.h"
+#include <iostream>
 
 class StatusBarItemInfo : public StatusBarItem {
 	private:
@@ -15,6 +16,7 @@ class StatusBarItemInfo : public StatusBarItem {
 		void setText(std::string text);
 
 		void draw(Display*, Window*, GC*);
+		void checkClick(int, int);
 };
 
 #endif //_STATUS_BAR_ITEM_INFO_

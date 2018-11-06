@@ -40,6 +40,7 @@ class StatusBar {
 		void redraw();
 		int getHeight();
 		void setText(std::string);
+		void checkClick(int, int);
 };
 
 #endif //_STATUS_BAR_

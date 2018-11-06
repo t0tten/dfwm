@@ -19,4 +19,14 @@ void StatusBarItemInfo::draw(Display* disp, Window* wnd, GC* gc) {
                         getText().length());
 }
 
+void StatusBarItemInfo::checkClick(int x, int y) {
+	/*std::cout << "checking click" << std::endl;
+	std::cout << "X: " << x << ", Y: " << y << std::endl;
+	std::cout << "MyX: " << getX() << ", MyY: " << getY() << std::endl;
+	std::cout << "MyWidth: " << getWidth() << ", MyHeight: " << getHeight() << std::endl;*/
 
+	int tmpX = xWindowAttributes.width - getX();
+	if(x > tmpX && x < (tmpX + getWidth()) && y > getY() && y < (getY() + getHeight())) {
+		std::cout << "CLICKED ON ME: " << getText() << std::endl;
+	}
+}
