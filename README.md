@@ -26,13 +26,11 @@ Key bindings:
 ### Desktop
 * Minimize functionality?
 
-
 ### Launcher
 * Launcher should close when it loose focus
 
 ### Statusbar
 * Clickable infos
-* Scroll through desktops when scrolling on statusbar
 
 ### Menu
 
@@ -64,6 +62,7 @@ Key bindings:
 ### Statusbar
 * Get current time/date
 * Title updates on window change
+* Scroll through desktops when scrolling on statusbar
 
 ### Menu
 * A bit off - not really in the middle

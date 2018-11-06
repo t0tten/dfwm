@@ -215,24 +215,22 @@ void Dfwm::removeMapped(Window window) {
 }
 
 void Dfwm::translateClientMessage(XClientMessageEvent xclient) {
-	LOGGER_DEBUGF("MESSAGE TYPE: %s", XGetAtomName(disp, xclient.message_type));
+	LOGGER_DEBUGF("CLIENT MESSAGE - TYPE: %s", XGetAtomName(disp, xclient.message_type));
 
 	if(xclient.message_type == NET_WM_STATE) {}
 }
 
 void Dfwm::checkWindow(Window window) {
-	/*int format;
-        long result = -1;
-        unsigned char *p = NULL;
-        unsigned long n, extra;
-        Atom real;
-	std::cout << "WM_STATE: " << std::endl;
-	if(XGetWindowProperty(disp, window, WM_STATE, 0L, 2L, False, WM_STATE, &real, &format, &n, &extra, (unsigned char **)&p) == Success) {
-		std::cout << "n: " << n << std::endl;
-		if(n != 0) result = *p;
+	Atom type;
+	Atom* atoms;
+	unsigned long len, remain;
+	int form;
+
+	LOGGER_DEBUGF("%d", XGetWindowProperty(disp, window, NET_WM_WINDOW_TYPE, 0, 1024, False, XA_ATOM, &type, &form, &len, &remain, (unsigned char**)&atoms));
+	for(int i = 0; i < (int)len; i++) {
+		LOGGER_DEBUGF("%s", XGetAtomName(disp, atoms[i]));
 	}
-	std::cout << "Result: " << result << std::endl;
-	std::cout << "IconicState: " << IconicState << std::endl;*/
+
 
         DfwmWindow win = DfwmWindow();
         DfwmStatus status = win.init(configuration, this->disp, window, root);
@@ -248,6 +246,14 @@ void Dfwm::checkWindow(Window window) {
 void Dfwm::buttonPress(XButtonPressedEvent *ev) {
 	this->refocus(ev->window);
 	//Städa pekare?
+}
+
+void Dfwm::buttonPressed(XButtonEvent& be) {
+	/* Clicked on statusbar */
+	if(be.y > 0 && be.y < 25) {
+		if(be.button == 4)		this->incrementSelected();
+		else if (be.button == 5) 	this->decrementSelected();
+	}
 }
 
 void Dfwm::enterNotify(XCrossingEvent& ce) {
@@ -283,7 +289,9 @@ void Dfwm::handleXEvent() {
                         break;
                 case ButtonPress:
                         LOGGER_INFO("ButtonPress");
+			std::cout << "ButtonPress" << std::endl;
                         //this->buttonPress(&e.xbutton);
+			this->buttonPressed(e.xbutton);
                         break;
                 case KeyPress:
                         keys->translate_KeyDown(this, &e.xkey);
